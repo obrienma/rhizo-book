@@ -1,0 +1,96 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Role {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  users     User[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model User {
+  id                    Int                @id @default(autoincrement())
+  email                 String             @unique
+  name                  String
+  password              String
+  roleId                Int
+  role                  Role               @relation(fields: [roleId], references: [id])
+  providerProfile       ProviderProfile?
+  patientProfile        PatientProfile?
+  providedAppointments  Appointment[]      @relation("ProviderAppointments")
+  patientAppointments   Appointment[]      @relation("PatientAppointments")
+  createdAt             DateTime           @default(now())
+  updatedAt             DateTime           @updatedAt
+
+  @@index([email])
+}
+
+model ProviderProfile {
+  id                  Int                @id @default(autoincrement())
+  userId              Int                @unique
+  user                User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  specialty           String?
+  bio                 String?
+  licenseNumber       String?
+  appointmentDuration Int                @default(30)
+  availabilitySlots   AvailabilitySlot[]
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+}
+
+model PatientProfile {
+  id           Int       @id @default(autoincrement())
+  userId       Int       @unique
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  dateOfBirth  DateTime?
+  phone        String?
+  medicalNotes String?   @db.Text
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model AvailabilitySlot {
+  id         Int             @id @default(autoincrement())
+  providerId Int
+  provider   ProviderProfile @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  dayOfWeek  Int             // 0-6 (Sunday-Saturday)
+  startTime  String          // Store as "HH:MM" format
+  endTime    String          // Store as "HH:MM" format
+  isActive   Boolean         @default(true)
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+
+  @@index([providerId])
+}
+
+enum AppointmentStatus {
+  SCHEDULED
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+model Appointment {
+  id                 Int               @id @default(autoincrement())
+  providerId         Int
+  provider           User              @relation("ProviderAppointments", fields: [providerId], references: [id], onDelete: Cascade)
+  patientId          Int
+  patient            User              @relation("PatientAppointments", fields: [patientId], references: [id], onDelete: Cascade)
+  startTime          DateTime
+  endTime            DateTime
+  status             AppointmentStatus @default(SCHEDULED)
+  notes              String?           @db.Text
+  cancellationReason String?           @db.Text
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+
+  @@index([providerId, startTime])
+  @@index([patientId])
+}
