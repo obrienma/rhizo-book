@@ -1,0 +1,24 @@
+### Register a new user
+POST http://localhost:3000/auth/register
+Content-Type: application/json
+
+{
+    "email": "test@example.com",
+    "name": "Test User",
+    "password": "password123",
+    "roleId": 1
+}
+
+### Login
+# @name login
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+    "email": "test@example.com",
+    "password": "password123"
+}
+
+### Get Appointments (Unprotected by default, but ready for testing if you add the Guard)
+GET http://localhost:3000/appointments
+Authorization: Bearer {{login.response.body.accessToken}}
