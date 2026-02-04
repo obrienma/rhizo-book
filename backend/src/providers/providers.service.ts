@@ -1,26 +1,58 @@
-import { Injectable } from '@nestjs/common';
-import { CreateProviderDto } from './dto/create-provider.dto';
-import { UpdateProviderDto } from './dto/update-provider.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class ProvidersService {
-  create(createProviderDto: CreateProviderDto) {
-    return 'This action adds a new provider';
+  constructor(private prisma: PrismaService) {}
+
+  async findAll() {
+    return this.prisma.user.findMany({
+      where: {
+        role: { name: 'provider' },
+      },
+      // include: {
+      //   providerProfile: {
+      //     include: {
+      //       availabilitySlots: true,
+      //     },
+      //   },
+      // },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        providerProfile: true,
+      },
+    });
   }
 
-  findAll() {
-    return `This action returns all providers`;
-  }
+  async findOne(id: number) {
+    const provider = await this.prisma.user.findFirst({
+      where: {
+        id,
+        role: { name: 'provider' },
+      },
+      // include: {
+      //   providerProfile: {
+      //     include: {
+      //       availabilitySlots: {
+      //         where: { isActive: true },
+      //       },
+      //     },
+      //   },
+      // },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        providerProfile: true,
+      },
+    });
 
-  findOne(id: number) {
-    return `This action returns a #${id} provider`;
-  }
+    if (!provider) {
+      throw new NotFoundException('Provider not found');
+    }
 
-  update(id: number, updateProviderDto: UpdateProviderDto) {
-    return `This action updates a #${id} provider`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} provider`;
+    return provider;
   }
 }
