@@ -4,7 +4,7 @@ import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @ApiTags('Users')
-@ApiBearerAuth()
+@ApiBearerAuth('bearer')
 @Controller('users')
 @UseGuards(JwtAuthGuard)
 export class UsersController {
