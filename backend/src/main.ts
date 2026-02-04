@@ -7,16 +7,11 @@ import * as dotenv from 'dotenv';
 // Load environment variables FIRST
 dotenv.config({ path: '.env' });
 
-// Add debug log right after loading env vars
-console.log('😎 JWT_SECRET loaded:', process.env.JWT_SECRET);
-console.log('😎 Environment file path:', '.env');
-console.log('😎 Current working directory:', process.cwd());
-
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.enableCors({
-    origin: 'http://${host}:${port}',
+    origin: true, // Allow all origins in production, will later specify frontend URL
     credentials: true,
   });
 
@@ -43,10 +38,15 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
-  const port = 3001;
-  const host = process.env.HOST || 'localhost';
-  await app.listen(port);
-  console.log(`🚀 Backend running on http://${host}:${port}`);
-  console.log(`📚 Swagger docs available at http://${host}:${port}/api`);
+  const port = process.env.PORT || 3001; // ← Read from environment
+  await app.listen(port, '0.0.0.0'); // ← Bind to all interfaces
+
+  if (process.env.NODE_ENV === 'production') {
+    console.log(`🚀 Backend running on port ${port}`);
+    console.log(`📚 Swagger docs available at /api`);
+  } else {
+    console.log(`🚀 Backend running on http://localhost:${port}`);
+    console.log(`📚 Swagger docs available at http://localhost:${port}/api`);
+  }
 }
 bootstrap();
