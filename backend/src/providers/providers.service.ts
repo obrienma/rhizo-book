@@ -32,20 +32,18 @@ export class ProvidersService {
         id,
         role: { name: 'provider' },
       },
-      // include: {
-      //   providerProfile: {
-      //     include: {
-      //       availabilitySlots: {
-      //         where: { isActive: true },
-      //       },
-      //     },
-      //   },
-      // },
       select: {
         id: true,
         name: true,
         email: true,
-        providerProfile: true,
+        providerProfile: {
+          include: {
+            availabilitySlots: {
+              where: { isActive: true },
+              orderBy: [{ dayOfWeek: 'asc' }, { startTime: 'asc' }],
+            },
+          },
+        },
       },
     });
 

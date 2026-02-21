@@ -21,6 +21,9 @@ export default function Navigation() {
           <Link href="/dashboard" className="text-sm hover:underline">
             Dashboard
           </Link>
+          <Link href="/appointments" className="text-sm hover:underline">
+            Appointments
+          </Link>
           {session.user.roleName === 'patient' && (
             <Link href="/providers" className="text-sm hover:underline">
               Providers
