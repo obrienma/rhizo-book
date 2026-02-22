@@ -182,6 +182,9 @@ Known issues and planned improvements are tracked in the project's [GitHub Issue
 ```bash
 cd backend
 npm run start:dev
+
+cd ../frontend
+npm run dev
 ```
 
 The API will be available at `http://localhost:3001`
