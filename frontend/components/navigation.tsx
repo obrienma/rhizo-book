@@ -32,7 +32,7 @@ export default function Navigation() {
         </div>
         <div className="flex items-center space-x-4">
           <span className="text-sm text-gray-600">{session.user.name}</span>
-          <Button variant="outline" onClick={() => signOut()}>
+          <Button variant="outline" onClick={() => signOut({ callbackUrl: '/' })}>
             Sign Out
           </Button>
         </div>

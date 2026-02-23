@@ -1,86 +1,59 @@
 # Health Appointment Scheduler — Frontend
 
-Next.js 15 frontend for the Health Appointment Scheduler. Patients can browse providers, book appointments, and manage their schedule. Providers can view and cancel upcoming appointments.
+Next.js 16 frontend for the Health Appointment Scheduler. Patients can browse providers, book appointments, and manage their schedule. Providers can view and cancel upcoming appointments.
 
 ## Stack
 
-- **Next.js 15** + TypeScript + App Router
+- **Next.js 16** + TypeScript + App Router
 - **Tailwind CSS** + shadcn/ui components
-- **NextAuth** for session management (calls the NestJS backend for auth)
+- **NextAuth v4** for session management (calls the NestJS backend for auth)
 - **Axios** with automatic JWT injection
+- **react-hook-form** + **zod** for form validation
 
 ## Getting Started
 
 See [../docs/DEV_GETTING_STARTED.md](../docs/DEV_GETTING_STARTED.md) for full setup including environment variables.
 
-```bash
-npm install
-npm run dev          # http://localhost:3000
-```
-
-## Scripts
-
-```bash
-npm run dev          # development server with hot reload
-npm run build        # production build
-npm run start        # run production build
-npm run lint         # ESLint
-```
-
-## Environment Variables
-
-Create `frontend/.env.local`:
-
-```env
-NEXT_PUBLIC_API_URL=http://localhost:3001
-NEXTAUTH_URL=http://localhost:3000
-NEXTAUTH_SECRET=your-secret-here
-```
-
 ## Page Map
 
 | Route | Description | Access |
 |-------|-------------|--------|
+| `/` | Landing page (RhizoBook marketing) | Public |
 | `/login` | Sign in | Public |
 | `/dashboard` | Patient or provider dashboard | Authenticated |
 | `/providers` | Browse all providers | Patient |
-| `/providers/[id]` | Provider detail + booking form | Patient |
-| `/appointments` | All appointments with filter + cancel | Authenticated |
+| `/providers/[id]` | Provider detail + time slot picker + booking | Patient |
+| `/appointments` | Full appointment list with status filter + cancel | Authenticated |
 
 ## Project Structure
 
 ```
 app/
-├── login/               Sign-in page (NextAuth)
-├── dashboard/           Renders PatientDashboard or ProviderDashboard
-├── providers/
-│   ├── page.tsx         Provider listing
-│   └── [id]/page.tsx    Provider detail + time slot picker + booking
-└── appointments/        Full appointment list, status filter, cancel dialog
+├── (marketing)/
+│   └── page.tsx         Landing page (responsive nav, hero, provider/patient CTAs)
+├── (app)/
+│   ├── layout.tsx        Shared layout with Navigation
+│   ├── dashboard/        Renders PatientDashboard or ProviderDashboard by role
+│   ├── providers/
+│   │   ├── page.tsx      Provider listing
+│   │   └── [id]/page.tsx Provider detail + time slot picker + booking
+│   └── appointments/     Full appointment list, status filter, cancel dialog
+├── api/
+│   └── auth/[...nextauth]/  NextAuth route handler
+├── login/               Sign-in page
+├── icon.svg             App favicon (auto-loaded by Next.js)
+├── globals.css
+├── layout.tsx           Root layout (fonts, Providers wrapper)
+└── providers.tsx        SessionProvider + ThemeProvider
 components/
 ├── dashboards/
 │   ├── patient-dashboard.tsx
 │   └── provider-dashboard.tsx
-├── navigation.tsx
+├── navigation.tsx       Authenticated top nav (role-aware links, sign out)
 └── ui/                  shadcn/ui components
 lib/
 ├── api.ts               Axios instance with Bearer token interceptor
 └── utils.ts
 types/
-└── next-auth.d.ts       Session type extensions
-```
-
-
-## Getting Started
-
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+└── next-auth.d.ts       Session type extensions (roleName, accessToken)
 ```

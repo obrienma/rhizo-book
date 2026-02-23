@@ -78,13 +78,6 @@ export default function LoginPage() {
             </Button>
           </form>
 
-          <div className="mt-4 text-center text-sm text-gray-600">
-            Test credentials:
-            <br />
-            Provider: provider@test.com / password
-            <br />
-            Patient: patient@test.com / password
-          </div>
         </CardContent>
       </Card>
     </div>

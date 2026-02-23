@@ -66,7 +66,7 @@ npx prisma db seed
 
 Creates 3 providers, 3 patients, and 8 sample appointments (past/completed, cancelled, and upcoming).
 
-**Test credentials (all passwords: `password123`)**
+** 🌱 Test credentials (all passwords: `password123`)**
 
 | Role | Email |
 |------|-------|
