@@ -118,6 +118,7 @@ export default function PatientRegisterPage() {
                   placeholder="Jane Doe"
                   autoComplete="name"
                   className="font-semibold text-slate-800 placeholder:text-slate-300"
+                  suppressHydrationWarning
                   {...register('name')}
                 />
                 {errors.name && (
@@ -136,6 +137,7 @@ export default function PatientRegisterPage() {
                   placeholder="jane@example.com"
                   autoComplete="email"
                   className="font-semibold text-slate-800 placeholder:text-slate-300"
+                  suppressHydrationWarning
                   {...register('email')}
                 />
                 {errors.email && (
@@ -154,6 +156,7 @@ export default function PatientRegisterPage() {
                   placeholder="At least 6 characters"
                   autoComplete="new-password"
                   className="font-semibold text-slate-800 placeholder:text-slate-300"
+                  suppressHydrationWarning
                   {...register('password')}
                 />
                 {errors.password && (
@@ -172,6 +175,7 @@ export default function PatientRegisterPage() {
                   placeholder="Repeat your password"
                   autoComplete="new-password"
                   className="font-semibold text-slate-800 placeholder:text-slate-300"
+                  suppressHydrationWarning
                   {...register('confirmPassword')}
                 />
                 {errors.confirmPassword && (
@@ -182,7 +186,6 @@ export default function PatientRegisterPage() {
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                suppressHydrationWarning
                 className="w-full bg-[#2DD4BF] hover:bg-teal-500 text-[#164E63] font-black rounded-2xl py-6 text-base shadow-lg active:scale-95 transition-all"
               >
                 {isSubmitting ? 'Creating account…' : 'JOIN THE NETWORK'}
@@ -195,6 +198,12 @@ export default function PatientRegisterPage() {
                 Sign in
               </Link>
             </p>
+
+            <div className="mt-5 pt-5 border-t border-green-50 text-center">
+              <Link href="/" className="text-sm font-semibold text-slate-500 hover:text-teal-600 transition">
+                ← Back to home
+              </Link>
+            </div>
           </CardContent>
         </Card>
 
