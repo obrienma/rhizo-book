@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import api from '@/lib/api';
-import ProvidersPage from '@/app/providers/page';
+import ProvidersPage from '@/app/(app)/providers/page';
 
 vi.mock('@/lib/api', () => ({
   default: { get: vi.fn() },

@@ -22,7 +22,7 @@ async function bootstrap() {
   }));
 
   const config = new DocumentBuilder()
-    .setTitle('Health Appointment Scheduler API')
+    .setTitle('RhizoBook API')
     .setDescription('API for managing healthcare appointments')
     .setVersion('1.0')
     .addBearerAuth(

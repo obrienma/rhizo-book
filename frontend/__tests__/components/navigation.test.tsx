@@ -55,6 +55,6 @@ describe('Navigation', () => {
     vi.mocked(useSession).mockReturnValue(makeSession('patient', 'Jane'));
     render(<Navigation />);
     await userEvent.click(screen.getByRole('button', { name: /sign out/i }));
-    expect(signOut).toHaveBeenCalled();
+    expect(signOut).toHaveBeenCalledWith({ callbackUrl: '/' });
   });
 });
