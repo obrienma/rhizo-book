@@ -4,8 +4,8 @@ A full-stack healthcare appointment scheduling system built with NestJS, Next.js
 
 ## 🚧 Status
 
-- **Backend API** — Live at **https://rhizo-book-production.up.railway.app/api** (Swagger UI)
-- **Frontend** — deployed and functional
+- **Backend API** — Live at **https://api.rhizobook.cyberrhizome.ca/api** (Swagger UI)
+- **Frontend** — Live at **https://rhizobook.cyberrhizome.ca**
 - Both services connect to a hosted PostgreSQL database on [Neon](https://neon.tech)
 
 ## 📖 Documentation
@@ -37,6 +37,7 @@ A full-stack healthcare appointment scheduling system built with NestJS, Next.js
 - [x] Booking flow with availability-based time slot picker
 - [x] Appointment cancellation with reason
 - [x] Public landing page
+- [ ] New user sign up
 - [ ] Unified branding experience for authenticated and unauthenticated users
 - [ ] Unauthenticated provider search
 - [ ] Email notifications and reminders

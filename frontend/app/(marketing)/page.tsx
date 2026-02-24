@@ -162,7 +162,7 @@ const LandingPage: React.FC = () => {
 
       {/* --- FOOTER --- */}
       <footer className="py-12 text-center text-slate-400 text-sm">
-        <p>© 2026 RhizoBook. Hosted on cyber-rhizome.ca</p>
+        <p>© 2026 RhizoBook. Hosted on CyberRhizome.ca</p>
       </footer>
     </div>
   );
