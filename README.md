@@ -1,14 +1,51 @@
-# RhizoBook | Health Appointment Scheduler
+# ![](frontend/public/flavicon.svg) RhizoBook | Health Appointment Scheduler
 
 A full-stack healthcare appointment scheduling system built with NestJS, Next.js, and TypeScript. Patients can browse providers, book appointments, and manage their schedule. Providers can view upcoming appointments and manage cancellations.
 
-## Status
+## 🚧 Status
 
-- **Backend API** — live at **https://health-scheduler-ts.onrender.com/api** (Swagger UI, currently slow on initial load. Transitioning to Railway for immediate availability.)
+- **Backend API** — Live at **https://rhizo-book-production.up.railway.app/api** (Swagger UI)
 - **Frontend** — deployed and functional
 - Both services connect to a hosted PostgreSQL database on [Neon](https://neon.tech)
 
-## Tech Stack
+## 📖 Documentation
+
+| File | Contents |
+|------|----------|
+| [docs/DEV_GETTING_STARTED.md](docs/DEV_GETTING_STARTED.md) | Local development setup |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | System design, data model, module map, auth flow |
+| [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Railway + Vercel + Neon production deployment |
+| [backend/README.md](backend/README.md) | Backend-specific commands and structure |
+| [frontend/README.md](frontend/README.md) | Frontend-specific commands and structure |
+
+## 🏥 Features
+
+- **Multi-role authentication** — JWT-based login for Providers and Patients via NextAuth
+- **Provider discovery** — patients browse providers by specialty with live availability
+- **Appointment booking** — time-slot picker generated from provider availability schedules
+- **Appointment management** — list, filter by status, and cancel with optional reason
+- **Swagger / OpenAPI** — fully documented API with typed request/response schemas
+- **Role-based access control** — providers and patients see only their own data
+- **Landing page** — public marketing page with provider/patient CTAs
+
+## 🚧 Roadmap
+
+- [x] Backend API with full CRUD for appointments
+- [x] JWT authentication with role-based access
+- [x] Swagger / OpenAPI documentation
+- [x] Frontend — patient and provider dashboards
+- [x] Booking flow with availability-based time slot picker
+- [x] Appointment cancellation with reason
+- [x] Public landing page
+- [ ] Unified branding experience for authenticated and unauthenticated users
+- [ ] Unauthenticated provider search
+- [ ] Email notifications and reminders
+- [ ] Calendar view for appointments
+- [ ] Recurring availability schedules
+- [ ] Timezone handling
+- [ ] HIPAA compliance features
+
+## 🚀 Tech Stack
 
 | Layer | Technology |
 |-------|-----------|
@@ -20,42 +57,11 @@ A full-stack healthcare appointment scheduling system built with NestJS, Next.js
 | Forms | react-hook-form + zod |
 | API docs | Swagger / OpenAPI |
 
-## Features
+## 🛠️ Quick Start
 
-- **Multi-role authentication** — JWT-based login for Providers and Patients via NextAuth
-- **Provider discovery** — patients browse providers by specialty with live availability
-- **Appointment booking** — time-slot picker generated from provider availability schedules
-- **Appointment management** — list, filter by status, and cancel with optional reason
-- **Swagger / OpenAPI** — fully documented API with typed request/response schemas
-- **Role-based access control** — providers and patients see only their own data
-- **Landing page** — public marketing page with provider/patient CTAs
+See [docs/DEV_GETTING_STARTED.md](docs/DEV_GETTING_STARTED.md) for full local setup instructions.
 
-## Quick Start
-
-See [docs/DEV_GETTING_STARTED.md](docs/DEV_GETTING_STARTED.md) for full local setup including environment variables.
-
-```bash
-# Backend
-cd backend && npm install && npm run start:dev   # http://localhost:3001
-
-# Frontend (separate terminal)
-cd frontend && npm install && npm run dev         # http://localhost:3000
-```
-
-## Seed Credentials
-
-After running `npx prisma db seed` in the `backend/` directory:
-
-| Role | Email | Password |
-|------|-------|----------|
-| Provider | sarah.johnson@clinic.com | password123 |
-| Provider | mike.chen@clinic.com | password123 |
-| Provider | priya.patel@clinic.com | password123 |
-| Patient | alice.smith@email.com | password123 |
-| Patient | james.nguyen@email.com | password123 |
-| Patient | emma.wilson@email.com | password123 |
-
-## Project Structure
+## 📂 Project Structure
 
 ```
 health-scheduler-ts/
@@ -86,38 +92,24 @@ health-scheduler-ts/
     └── components/
 ```
 
-## Documentation
+## 🤝 Contributing
 
-| File | Contents |
-|------|----------|
-| [docs/DEV_GETTING_STARTED.md](docs/DEV_GETTING_STARTED.md) | Local development setup |
-| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | System design, data model, module map, auth flow |
-| [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Render + Neon production deployment |
-| [backend/README.md](backend/README.md) | Backend-specific commands and structure |
-| [frontend/README.md](frontend/README.md) | Frontend-specific commands and structure |
+This is a personal project for demonstration purposes. Contributions, suggestions, and feedback are welcome! If you find a bug or have an idea for improvement, feel free to open an issue or submit a pull request.
 
-## Roadmap
+## 📄 License
 
-- [x] Backend API with full CRUD for appointments
-- [x] JWT authentication with role-based access
-- [x] Swagger / OpenAPI documentation
-- [x] Frontend — patient and provider dashboards
-- [x] Booking flow with availability-based time slot picker
-- [x] Appointment cancellation with reason
-- [x] Public landing page
-- [ ] Consistent branding across
-- [ ]
-- [ ] Email notifications and reminders
-- [ ] Calendar view for appointments
-- [ ] Recurring availability schedules
-- [ ] Timezone handling
-- [ ] HIPAA compliance features
+This project is private and proprietary.
 
-## Author
+## 👩‍💻 Author
 
 **Amanda O'Brien**
 
+## 🙏 Acknowledgments
 
-## License
+- NestJS team for the great framework
+- Prisma for excellent ORM tooling
+- Neon for serverless PostgreSQL hosting
 
-Private and proprietary.
+
+
+
