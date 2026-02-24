@@ -102,7 +102,7 @@ const LandingPage: React.FC = () => {
             Find care, book instantly, and grow your roots.
           </p>
 
-          {/* SEARCH ENGINE UI */}
+          {/*  SEARCH ENGINE UI */}
           <div className="bg-white p-3 rounded-3xl shadow-2xl shadow-emerald-900/10 flex flex-col md:flex-row gap-2 border border-white">
             <div className="flex-1 px-6 py-4 flex flex-col items-start border-r border-slate-50">
               <label className="text-[10px] font-black uppercase tracking-widest text-teal-600 mb-1">Service Type</label>

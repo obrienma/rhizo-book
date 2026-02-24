@@ -23,7 +23,7 @@ import { AppointmentEntity } from './entities/appointment.entity';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @ApiTags('Appointments')
-@Controller('appointments')
+@Controller({ path: 'appointments', version: '1' })
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth('bearer')
 export class AppointmentsController {

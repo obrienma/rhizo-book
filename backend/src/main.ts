@@ -1,5 +1,5 @@
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import * as dotenv from 'dotenv';
@@ -14,6 +14,8 @@ async function bootstrap() {
     origin: true, // Allow all origins in production, will later specify frontend URL
     credentials: true,
   });
+
+  app.enableVersioning({ type: VersioningType.URI });
 
   app.useGlobalPipes(new ValidationPipe({
     whitelist: true,

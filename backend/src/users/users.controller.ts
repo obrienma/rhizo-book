@@ -12,7 +12,7 @@ import { UserEntity } from './entities/user.entity';
 
 @ApiTags('Users')
 @ApiBearerAuth('bearer')
-@Controller('users')
+@Controller({ path: 'users', version: '1' })
 @UseGuards(JwtAuthGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}

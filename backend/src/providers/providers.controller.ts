@@ -13,7 +13,7 @@ import { ProviderEntity } from './entities/provider.entity';
 @ApiTags('Providers')
 @ApiBearerAuth('bearer')
 @UseGuards(JwtAuthGuard)
-@Controller('providers')
+@Controller({ path: 'providers', version: '1' })
 export class ProvidersController {
   constructor(private readonly providersService: ProvidersService) {}
 
