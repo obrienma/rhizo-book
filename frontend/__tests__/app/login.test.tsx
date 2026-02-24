@@ -43,8 +43,33 @@ describe('LoginPage', () => {
     await userEvent.type(screen.getByLabelText(/password/i), 'wrongpass');
     await userEvent.click(screen.getByRole('button', { name: /sign in/i }));
     await waitFor(() =>
-      expect(screen.getByText(/invalid email or password/i)).toBeInTheDocument()
+      expect(screen.getByText(/incorrect email or password/i)).toBeInTheDocument()
     );
+  });
+
+  it('shows zod error for invalid email format', async () => {
+    render(<LoginPage />);
+    await userEvent.type(screen.getByLabelText(/email/i), 'not-an-email');
+    await userEvent.type(screen.getByLabelText(/password/i), 'password');
+    await userEvent.click(screen.getByRole('button', { name: /sign in/i }));
+    await waitFor(() =>
+      expect(screen.getByText(/enter a valid email address/i)).toBeInTheDocument()
+    );
+  });
+
+  it('shows zod error when password is empty', async () => {
+    render(<LoginPage />);
+    await userEvent.type(screen.getByLabelText(/email/i), 'patient@test.com');
+    await userEvent.click(screen.getByRole('button', { name: /sign in/i }));
+    await waitFor(() =>
+      expect(screen.getByText(/password is required/i)).toBeInTheDocument()
+    );
+  });
+
+  it('renders Register and Back to home links', () => {
+    render(<LoginPage />);
+    expect(screen.getByRole('link', { name: /register/i })).toHaveAttribute('href', '/register');
+    expect(screen.getByRole('link', { name: /back to home/i })).toHaveAttribute('href', '/');
   });
 
   it('redirects to /dashboard on successful sign in', async () => {
