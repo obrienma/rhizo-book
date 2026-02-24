@@ -140,7 +140,7 @@ const LandingPage: React.FC = () => {
           <p className="text-slate-500 mb-8 font-medium">
             Search for local specialists, view real-time availability, and secure your appointment without a single phone call.
           </p>
-          <a href="/login?role=patient" className="text-teal-600 font-bold flex items-center gap-2 hover:gap-3 transition-all">
+          <a href="/register" className="text-teal-600 font-bold flex items-center gap-2 hover:gap-3 transition-all">
             Join the network →
           </a>
         </div>
