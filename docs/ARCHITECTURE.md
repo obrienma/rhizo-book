@@ -6,7 +6,7 @@ Health Appointment Scheduler is a monorepo containing a NestJS REST API backend 
 
 ```
 ┌─────────────────────┐        HTTPS         ┌──────────────────────────┐
-│   Next.js Frontend  │ ──────────────────► │   NestJS Backend API     │
+│   Next.js Frontend  │ ──────────────────►  │   NestJS Backend API     │
 │   (Next.js 15)      │ ◄──────────────────  │   (NestJS 11 / Node.js)  │
 │   Port 3000         │      JSON / JWT      │   Port 3001              │
 └─────────────────────┘                      └────────────┬─────────────┘
@@ -75,16 +75,18 @@ Client                        Backend                      Database
   │                              │◄─ user + hashed pw ─────────┤
   │                              ├─ bcrypt.compare()           │
   │                              ├─ jwtService.sign(payload)   │
-  │◄─ { user, access_token } ───┤                             │
+  │◄─ { user, access_token } ─── ┤                             │
   │                              │                             │
   ├─ GET /appointments ─────────►│                             │
   │  Authorization: Bearer <jwt> ├─ JwtAuthGuard validates     │
   │                              ├─ Extracts req.user          │
   │                              ├─ Queries appointments ─────►│
-  │◄─ [...appointments] ────────┤◄─ results ──────────────────┤
+  │◄─ [...appointments] ──────── ┤◄─ results ──────────────────┤
 ```
 
 JWT payload: `{ sub: userId, email, roleId, roleName }`
+
+**Client-side Note:** NextAuth configuration is centralized in `frontend/lib/auth.ts` to ensure consistent session parsing between Client and Server components.
 
 ### Role-based Access
 

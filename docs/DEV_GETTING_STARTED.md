@@ -61,21 +61,24 @@ This creates all tables and applies any pending migrations from `prisma/migratio
 
 ```bash
 cd backend
+# Option A: Standard seed
 npx prisma db seed
+
+# Option B: Recommended refresh script (resets and seeds 73+ records)
+./refresh-db.sh
 ```
 
-Creates 3 providers, 3 patients, and 8 sample appointments (past/completed, cancelled, and upcoming).
+Creates 27 providers, 28 patients, and 73 sample appointments (past/completed, cancelled, and upcoming). This includes a wide range of French Canadian and cinematic character data.
 
 ** 🌱 Test credentials (all passwords: `password123`)**
 
 | Role | Email |
 |------|-------|
 | Provider | sarah.johnson@clinic.com |
-| Provider | mike.chen@clinic.com |
-| Provider | priya.patel@clinic.com |
+| Provider (QC) | jp.tremblay@clinic.com |
 | Patient | alice.smith@email.com |
-| Patient | james.nguyen@email.com |
-| Patient | emma.wilson@email.com |
+| Patient (QC) | pl.bouchard@email.com |
+| Patient (Billionaire) | bruce.wayne@email.com |
 
 > The seed script is idempotent — safe to run multiple times.
 

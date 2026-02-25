@@ -37,8 +37,9 @@ A full-stack healthcare appointment scheduling system built with NestJS, Next.js
 - [x] Booking flow with availability-based time slot picker
 - [x] Appointment cancellation with reason
 - [x] Public landing page
-- [ ] New user sign up
-- [ ] Unified branding experience for authenticated and unauthenticated users
+- [x] New Patient, Provider Sign up
+- [x] Unified branding experience for authenticated and unauthenticated users (RhizoBook)
+- [x] Expanded seed data with French Canadian and multi-character sets
 - [ ] Unauthenticated provider search
 - [ ] Email notifications and reminders
 - [ ] Calendar view for appointments
@@ -51,7 +52,7 @@ A full-stack healthcare appointment scheduling system built with NestJS, Next.js
 | Layer | Technology |
 |-------|-----------|
 | Backend | NestJS 11, TypeScript |
-| Frontend | Next.js 16, TypeScript, Tailwind CSS |
+| Frontend | Next.js 14+, TypeScript, Tailwind CSS |
 | Database | PostgreSQL (Neon serverless) |
 | ORM | Prisma 6 |
 | Auth | JWT + Passport (backend), NextAuth v4 (frontend) |
