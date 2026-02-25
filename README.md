@@ -95,8 +95,9 @@ health-scheduler-ts/
 ## 🤫 Sneak Peak
 <img width="1248" height="1165" alt="Screenshot 2026-02-24 005843" src="https://github.com/user-attachments/assets/b5462d91-3bfb-4e65-9a63-619a87600f63" />
 <img width="727" height="1190" alt="Screenshot 2026-02-24 005928" src="https://github.com/user-attachments/assets/3ef595fe-ac0d-4c42-8015-0b16eba506e0" />
-
-The User Dashboard will by styled to match the landing page.
+<img width="1078" height="1169" alt="Screenshot 2026-02-25 100252" src="https://github.com/user-attachments/assets/c2c4ed37-fa64-476f-9c69-e85e0f9fe532" />
+<img width="1089" height="1066" alt="Screenshot 2026-02-25 100336" src="https://github.com/user-attachments/assets/ca4288ab-b5dd-42c4-b3f6-5a72b0486580" />
+<img width="1063" height="1215" alt="Screenshot 2026-02-25 103528" src="https://github.com/user-attachments/assets/f7a95033-f9f3-456a-8f88-0775dd43ce1e" />
 
 ## 🤝 Contributing
 
