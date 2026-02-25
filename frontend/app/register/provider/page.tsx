@@ -15,23 +15,30 @@ import { submitRegistration } from '@/lib/register';
 
 const providerRegisterSchema = z
   .object({
-    name: z.string().min(3, 'Name must be at least 3 characters'),
-    email: z.string().email('Enter a valid email address'),
-    password: z.string().min(6, 'Password must be at least 6 characters'),
-    confirmPassword: z.string(),
+    ...baseRegisterFields.shape,
     specialty: z.string().optional(),
     bio: z.string().optional(),
     licenseNumber: z.string().optional(),
     appointmentDuration: z.preprocess(
-      (val) => (val === '' ? undefined : Number(val)),
-      z.number().int().min(1, 'Must be at least 1 minute').optional()
+      (val) => (val === '' || val === undefined ? undefined : val),
+      z.coerce.number().int().min(1, 'Must be at least 1 minute').optional()
     ),
   })
-  .refine((data) => data.password === data.confirmPassword, {
+  .refine(passwordsMatch, {
     message: 'Passwords do not match',
     path: ['confirmPassword'],
   });
-type ProviderRegisterFormValues = z.infer<typeof providerRegisterSchema>;
+
+interface ProviderRegisterFormValues {
+  name: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  specialty?: string;
+  bio?: string;
+  licenseNumber?: string;
+  appointmentDuration?: number;
+}
 
 const OPTIONAL_PLACEHOLDER = 'You can update this from your profile later';
 
@@ -43,13 +50,18 @@ export default function ProviderRegisterPage() {
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<ProviderRegisterFormValues>({
-    resolver: zodResolver(providerRegisterSchema),
+    resolver: zodResolver(providerRegisterSchema) as any,
+    defaultValues: {
+      name: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+    },
   });
 
-    // Use Zod to define the type automatically
-    type ProviderRegisterFormValues = z.infer<typeof providerRegisterSchema>;
-
-  const onSubmit = (values: ProviderRegisterFormValues) => submitRegistration(values, 1, router);
+  const onSubmit = async (values: ProviderRegisterFormValues) => {
+    await submitRegistration(values as any, 1, router);
+  };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#F0FDF4] px-4 py-12 font-sans selection:bg-teal-100">
@@ -210,9 +222,9 @@ export default function ProviderRegisterPage() {
                       placeholder="30"
                       autoComplete="off"
                       className="font-semibold text-slate-800 placeholder:text-slate-300"
-                      {...register('appointmentDuration', { valueAsNumber: true })}
+                      {...register('appointmentDuration')}
                     />
-                    {errors.appointmentDuration &&1 (
+                    {errors.appointmentDuration && (
                       <p className="text-xs text-red-500 font-medium">{errors.appointmentDuration.message}</p>
                     )}
                   </div>

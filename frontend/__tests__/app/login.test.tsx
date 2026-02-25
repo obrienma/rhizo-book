@@ -68,7 +68,7 @@ describe('LoginPage', () => {
 
   it('renders Register and Back to home links', () => {
     render(<LoginPage />);
-    expect(screen.getByRole('link', { name: /register/i })).toHaveAttribute('href', '/register');
+    expect(screen.getByRole('link', { name: /register/i })).toHaveAttribute('href', '/#join');
     expect(screen.getByRole('link', { name: /back to home/i })).toHaveAttribute('href', '/');
   });
 
@@ -82,8 +82,8 @@ describe('LoginPage', () => {
   });
 
   it('disables button and shows "Signing in..." while loading', async () => {
-    let resolveSignIn!: (v: unknown) => void;
-    vi.mocked(signIn).mockReturnValue(new Promise((res) => { resolveSignIn = res; }) as ReturnType<typeof signIn>);
+    let resolveSignIn!: (v: any) => void;
+    vi.mocked(signIn).mockReturnValue(new Promise((res) => { resolveSignIn = res; }) as any);
     render(<LoginPage />);
     await userEvent.type(screen.getByLabelText(/email/i), 'patient@test.com');
     await userEvent.type(screen.getByLabelText(/password/i), 'password');
