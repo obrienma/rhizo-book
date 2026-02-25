@@ -18,9 +18,10 @@ const providerRegisterSchema = baseRegisterFields
     specialty: z.string().optional(),
     bio: z.string().optional(),
     licenseNumber: z.string().optional(),
-    appointmentDuration: z
-      .union([z.literal(''), z.coerce.number().int().min(1, 'Must be at least 1 minute')])
-      .optional(),
+    appointmentDuration: z.preprocess(
+      (v) => (v === '' || v === undefined ? undefined : Number(v)),
+      z.number().int().min(1, 'Must be at least 1 minute').optional()
+    ),
   })
   .refine(passwordsMatch, {
     message: 'Passwords do not match',
@@ -203,9 +204,9 @@ export default function ProviderRegisterPage() {
                       placeholder="30"
                       autoComplete="off"
                       className="font-semibold text-slate-800 placeholder:text-slate-300"
-                      {...register('appointmentDuration')}
+                      {...register('appointmentDuration', { valueAsNumber: true })}
                     />
-                    {errors.appointmentDuration && (
+                    {errors.appointmentDuration &&1 (
                       <p className="text-xs text-red-500 font-medium">{errors.appointmentDuration.message}</p>
                     )}
                   </div>
@@ -215,7 +216,6 @@ export default function ProviderRegisterPage() {
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                suppressHydrationWarning
                 className="w-full bg-[#2DD4BF] hover:bg-teal-500 text-[#164E63] font-black rounded-2xl py-6 text-base shadow-lg active:scale-95 transition-all"
               >
                 {isSubmitting ? 'Creating account…' : 'JOIN AS A PROVIDER'}

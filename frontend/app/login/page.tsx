@@ -113,7 +113,6 @@ export default function LoginPage() {
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                suppressHydrationWarning
                 className="w-full bg-[#2DD4BF] hover:bg-teal-500 text-[#164E63] font-black rounded-2xl py-6 text-base shadow-lg active:scale-95 transition-all"
               >
                 {isSubmitting ? 'Signing in…' : 'SIGN IN'}
