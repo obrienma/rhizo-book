@@ -33,11 +33,21 @@ describe('LandingPage', () => {
     signInLinks.forEach((link) => expect(link).toHaveAttribute('href', '/login'));
   });
 
-  it('renders provider card link pointing to /login?role=provider', () => {
+  it('renders the provider card as a link to /register/provider', () => {
     render(<LandingPage />);
-    expect(screen.getByRole('link', { name: /manage your clinic/i })).toHaveAttribute(
-      'href',
-      '/login?role=provider',
-    );
+    const providerCard = screen.getByRole('link', { name: /for providers/i });
+    expect(providerCard).toHaveAttribute('href', '/register/provider');
+  });
+
+  it('provider card contains the "Join as a provider" CTA', () => {
+    render(<LandingPage />);
+    const providerCard = screen.getByRole('link', { name: /for providers/i });
+    expect(providerCard).toHaveTextContent(/join as a provider/i);
+  });
+
+  it('provider card has no nested anchor elements', () => {
+    render(<LandingPage />);
+    const providerCard = screen.getByRole('link', { name: /for providers/i });
+    expect(providerCard.querySelectorAll('a')).toHaveLength(0);
   });
 });
