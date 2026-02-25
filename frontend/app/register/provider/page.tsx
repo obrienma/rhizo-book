@@ -13,21 +13,24 @@ import Logo from '@/components/auth/logo';
 import { baseRegisterFields, passwordsMatch } from '@/lib/schemas/auth';
 import { submitRegistration } from '@/lib/register';
 
-const providerRegisterSchema = baseRegisterFields
-  .extend({
+const providerRegisterSchema = z
+  .object({
+    name: z.string().min(3, 'Name must be at least 3 characters'),
+    email: z.string().email('Enter a valid email address'),
+    password: z.string().min(6, 'Password must be at least 6 characters'),
+    confirmPassword: z.string(),
     specialty: z.string().optional(),
     bio: z.string().optional(),
     licenseNumber: z.string().optional(),
     appointmentDuration: z.preprocess(
-      (v) => (v === '' || v === undefined ? undefined : Number(v)),
+      (val) => (val === '' ? undefined : Number(val)),
       z.number().int().min(1, 'Must be at least 1 minute').optional()
     ),
   })
-  .refine(passwordsMatch, {
+  .refine((data) => data.password === data.confirmPassword, {
     message: 'Passwords do not match',
     path: ['confirmPassword'],
   });
-
 type ProviderRegisterFormValues = z.infer<typeof providerRegisterSchema>;
 
 const OPTIONAL_PLACEHOLDER = 'You can update this from your profile later';
@@ -42,6 +45,9 @@ export default function ProviderRegisterPage() {
   } = useForm<ProviderRegisterFormValues>({
     resolver: zodResolver(providerRegisterSchema),
   });
+
+    // Use Zod to define the type automatically
+    type ProviderRegisterFormValues = z.infer<typeof providerRegisterSchema>;
 
   const onSubmit = (values: ProviderRegisterFormValues) => submitRegistration(values, 1, router);
 
