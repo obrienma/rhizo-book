@@ -37,8 +37,8 @@ A full-stack healthcare appointment scheduling system built with NestJS, Next.js
 - [x] Booking flow with availability-based time slot picker
 - [x] Appointment cancellation with reason
 - [x] Public landing page
-- [ ] New user sign up
-- [ ] Unified branding experience for authenticated and unauthenticated users
+- [x] New user sign up
+- [x] Unified branding experience for authenticated and unauthenticated users
 - [ ] Unauthenticated provider search
 - [ ] Email notifications and reminders
 - [ ] Calendar view for appointments
