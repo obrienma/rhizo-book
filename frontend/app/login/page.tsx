@@ -62,7 +62,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#F0FDF4] px-4 font-sans selection:bg-teal-100">
+    <div className="flex min-h-screen items-center justify-center bg-[#F0FDF4] px-4 py-12 font-sans selection:bg-teal-100">
       <div className="w-full max-w-md">
         {/* Logo — click to return home */}
         <Link href="/" className="block mb-8">
