@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 
 // Simplified Logo Component for the Navbar
 const Logo = () => (
@@ -130,9 +131,12 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* --- CONTENT BLOCKS --- */}
-      <section className="max-w-6xl mx-auto py-20 px-6 grid md:grid-cols-2 gap-12">
+      <section id="join" className="max-w-6xl mx-auto py-20 px-6 grid md:grid-cols-2 gap-12">
         {/* Patient Path */}
-        <div className="bg-white p-10 rounded-[2.5rem] border border-green-50 shadow-sm hover:shadow-xl transition-all group">
+        <Link
+          href="/register"
+          className="block bg-white p-10 rounded-[2.5rem] border border-green-50 shadow-sm hover:shadow-xl transition-all group cursor-pointer"
+        >
           <div className="w-14 h-14 bg-teal-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-teal-500 transition-colors">
             <span className="text-2xl">🌱</span>
           </div>
@@ -140,13 +144,16 @@ const LandingPage: React.FC = () => {
           <p className="text-slate-500 mb-8 font-medium">
             Search for local specialists, view real-time availability, and secure your appointment without a single phone call.
           </p>
-          <a href="/login?role=patient" className="text-teal-600 font-bold flex items-center gap-2 hover:gap-3 transition-all">
+          <span className="text-teal-600 font-bold flex items-center gap-2 group-hover:gap-3 transition-all">
             Join the network →
-          </a>
-        </div>
+          </span>
+        </Link>
 
         {/* Provider Path */}
-        <div className="bg-[#164E63] p-10 rounded-[2.5rem] text-white shadow-sm hover:shadow-xl transition-all group">
+        <Link
+          href="/register/provider"
+          className="block bg-[#164E63] p-10 rounded-[2.5rem] text-white shadow-sm hover:shadow-xl transition-all group cursor-pointer"
+        >
           <div className="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-[#2DD4BF] transition-colors">
             <span className="text-2xl">🏢</span>
           </div>
@@ -154,10 +161,10 @@ const LandingPage: React.FC = () => {
           <p className="text-teal-100/70 mb-8 font-medium">
             Optimize your practice workflow. Manage your digital schedule, reduce no-shows, and focus on what matters: patient care.
           </p>
-          <a href="/login?role=provider" className="text-[#2DD4BF] font-bold flex items-center gap-2 hover:gap-3 transition-all">
-            Manage your clinic →
-          </a>
-        </div>
+          <span className="text-[#2DD4BF] font-bold flex items-center gap-2 group-hover:gap-3 transition-all">
+            Join as a provider →
+          </span>
+        </Link>
       </section>
 
       {/* --- FOOTER --- */}

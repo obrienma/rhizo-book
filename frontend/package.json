@@ -6,9 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
     "test": "vitest",
-    "test:run": "vitest run"
+    "test:run": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint . --ext .ts,.tsx",
+    "check": "tsc --noEmit && eslint . --ext .ts,.tsx"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

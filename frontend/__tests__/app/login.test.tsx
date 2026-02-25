@@ -43,8 +43,33 @@ describe('LoginPage', () => {
     await userEvent.type(screen.getByLabelText(/password/i), 'wrongpass');
     await userEvent.click(screen.getByRole('button', { name: /sign in/i }));
     await waitFor(() =>
-      expect(screen.getByText(/invalid email or password/i)).toBeInTheDocument()
+      expect(screen.getByText(/incorrect email or password/i)).toBeInTheDocument()
     );
+  });
+
+  it('shows zod error for invalid email format', async () => {
+    render(<LoginPage />);
+    await userEvent.type(screen.getByLabelText(/email/i), 'not-an-email');
+    await userEvent.type(screen.getByLabelText(/password/i), 'password');
+    await userEvent.click(screen.getByRole('button', { name: /sign in/i }));
+    await waitFor(() =>
+      expect(screen.getByText(/enter a valid email address/i)).toBeInTheDocument()
+    );
+  });
+
+  it('shows zod error when password is empty', async () => {
+    render(<LoginPage />);
+    await userEvent.type(screen.getByLabelText(/email/i), 'patient@test.com');
+    await userEvent.click(screen.getByRole('button', { name: /sign in/i }));
+    await waitFor(() =>
+      expect(screen.getByText(/password is required/i)).toBeInTheDocument()
+    );
+  });
+
+  it('renders Register and Back to home links', () => {
+    render(<LoginPage />);
+    expect(screen.getByRole('link', { name: /register/i })).toHaveAttribute('href', '/#join');
+    expect(screen.getByRole('link', { name: /back to home/i })).toHaveAttribute('href', '/');
   });
 
   it('redirects to /dashboard on successful sign in', async () => {
@@ -57,8 +82,8 @@ describe('LoginPage', () => {
   });
 
   it('disables button and shows "Signing in..." while loading', async () => {
-    let resolveSignIn!: (v: unknown) => void;
-    vi.mocked(signIn).mockReturnValue(new Promise((res) => { resolveSignIn = res; }) as ReturnType<typeof signIn>);
+    let resolveSignIn!: (v: any) => void;
+    vi.mocked(signIn).mockReturnValue(new Promise((res) => { resolveSignIn = res; }) as any);
     render(<LoginPage />);
     await userEvent.type(screen.getByLabelText(/email/i), 'patient@test.com');
     await userEvent.type(screen.getByLabelText(/password/i), 'password');

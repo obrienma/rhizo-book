@@ -22,6 +22,7 @@ const authOptions: NextAuthOptions = {
               email: credentials.email,
               password: credentials.password,
             }),
+            signal: AbortSignal.timeout(10000),
           });
 
           const data = await res.json();

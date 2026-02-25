@@ -56,6 +56,9 @@ function Button({
       data-variant={variant}
       data-size={size}
       className={cn(buttonVariants({ variant, size, className }))}
+      suppressHydrationWarning  // Adding this to deal with Password Mangers injecting elements.
+                                // fdprocessedid attribute mismatch error if it's only directly on Submits
+                                // It should be ok to add this without obfuscating real issues
       {...props}
     />
   )

@@ -1,6 +1,5 @@
 'use client';
 
-import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -11,45 +10,30 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import Link from 'next/link';
 import Logo from '@/components/auth/logo';
+import { baseRegisterSchema } from '@/lib/schemas/auth';
+import { submitRegistration } from '@/lib/register';
 
-const loginSchema = z.object({
-  email: z.string().email('Enter a valid email address'),
-  password: z.string().min(1, 'Password is required'),
-});
+const registerSchema = baseRegisterSchema;
 
-type LoginFormValues = z.infer<typeof loginSchema>;
+type RegisterFormValues = z.infer<typeof registerSchema>;
 
-export default function LoginPage() {
+export default function PatientRegisterPage() {
   const router = useRouter();
 
   const {
     register,
     handleSubmit,
-    setError,
     formState: { errors, isSubmitting },
-  } = useForm<LoginFormValues>({
-    resolver: zodResolver(loginSchema),
+  } = useForm<RegisterFormValues>({
+    resolver: zodResolver(registerSchema),
   });
 
-  const onSubmit = async (values: LoginFormValues) => {
-    const result = await signIn('credentials', {
-      email: values.email,
-      password: values.password,
-      redirect: false,
-    });
-
-    if (result?.error) {
-      setError('root', { message: 'Incorrect email or password. Please try again.' });
-    } else {
-      router.push('/dashboard');
-      router.refresh();
-    }
-  };
+  const onSubmit = (values: RegisterFormValues) => submitRegistration(values, 2, router);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#F0FDF4] px-4 py-12 font-sans selection:bg-teal-100">
       <div className="w-full max-w-md">
-        {/* Logo — click to return home */}
+        {/* Logo */}
         <Link href="/" className="block mb-8">
           <Logo />
         </Link>
@@ -57,23 +41,36 @@ export default function LoginPage() {
         <Card className="rounded-[2rem] border border-green-50 shadow-xl shadow-emerald-900/10">
           <CardHeader className="pb-2 text-center">
             <div className="inline-flex items-center justify-center w-14 h-14 bg-teal-50 rounded-2xl mx-auto mb-4">
-              <span className="text-2xl">🔑</span>
+              <span className="text-2xl">🌱</span>
             </div>
-            <h1 className="text-2xl font-black text-slate-900">Welcome back</h1>
+            <h1 className="text-2xl font-black text-slate-900">Create your account</h1>
             <p className="text-sm text-slate-500 font-medium mt-1">
-              Sign in to manage your appointments.
+              Join the network and find care in seconds.
             </p>
           </CardHeader>
 
           <CardContent className="pt-4">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
-              {errors.root && (
-                <div className="flex items-start gap-3 rounded-2xl bg-red-50 border border-red-100 px-4 py-3">
-                  <span className="mt-0.5 text-base">🔒</span>
-                  <p className="text-sm font-semibold text-red-600">{errors.root.message}</p>
-                </div>
-              )}
+              {/* Name */}
+              <div className="space-y-1.5">
+                <Label htmlFor="name" className="text-[10px] font-black uppercase tracking-widest text-teal-600">
+                  Full Name
+                </Label>
+                <Input
+                  id="name"
+                  type="text"
+                  placeholder="Jane Doe"
+                  autoComplete="name"
+                  className="font-semibold text-slate-800 placeholder:text-slate-300"
+                  suppressHydrationWarning
+                  {...register('name')}
+                />
+                {errors.name && (
+                  <p className="text-xs text-red-500 font-medium">{errors.name.message}</p>
+                )}
+              </div>
 
+              {/* Email */}
               <div className="space-y-1.5">
                 <Label htmlFor="email" className="text-[10px] font-black uppercase tracking-widest text-teal-600">
                   Email
@@ -92,6 +89,7 @@ export default function LoginPage() {
                 )}
               </div>
 
+              {/* Password */}
               <div className="space-y-1.5">
                 <Label htmlFor="password" className="text-[10px] font-black uppercase tracking-widest text-teal-600">
                   Password
@@ -99,8 +97,8 @@ export default function LoginPage() {
                 <Input
                   id="password"
                   type="password"
-                  placeholder="Your password"
-                  autoComplete="current-password"
+                  placeholder="At least 6 characters"
+                  autoComplete="new-password"
                   className="font-semibold text-slate-800 placeholder:text-slate-300"
                   suppressHydrationWarning
                   {...register('password')}
@@ -110,19 +108,38 @@ export default function LoginPage() {
                 )}
               </div>
 
+              {/* Confirm Password */}
+              <div className="space-y-1.5">
+                <Label htmlFor="confirmPassword" className="text-[10px] font-black uppercase tracking-widest text-teal-600">
+                  Confirm Password
+                </Label>
+                <Input
+                  id="confirmPassword"
+                  type="password"
+                  placeholder="Repeat your password"
+                  autoComplete="new-password"
+                  className="font-semibold text-slate-800 placeholder:text-slate-300"
+                  suppressHydrationWarning
+                  {...register('confirmPassword')}
+                />
+                {errors.confirmPassword && (
+                  <p className="text-xs text-red-500 font-medium">{errors.confirmPassword.message}</p>
+                )}
+              </div>
+
               <Button
                 type="submit"
                 disabled={isSubmitting}
                 className="w-full bg-[#2DD4BF] hover:bg-teal-500 text-[#164E63] font-black rounded-2xl py-6 text-base shadow-lg active:scale-95 transition-all"
               >
-                {isSubmitting ? 'Signing in…' : 'SIGN IN'}
+                {isSubmitting ? 'Creating account…' : 'JOIN THE NETWORK'}
               </Button>
             </form>
 
             <p className="mt-6 text-center text-sm text-slate-500">
-              Don&apos;t have an account?{' '}
-              <Link href="/#join" className="text-teal-600 font-bold hover:underline">
-                Register
+              Already have an account?{' '}
+              <Link href="/login" className="text-teal-600 font-bold hover:underline">
+                Sign in
               </Link>
             </p>
 
