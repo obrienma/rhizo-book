@@ -1,24 +1,20 @@
 'use client';
 
-import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import Link from 'next/link';
-import api from '@/lib/api';
+import Logo from '@/components/auth/logo';
+import { baseRegisterFields, passwordsMatch } from '@/lib/schemas/auth';
+import { submitRegistration } from '@/lib/register';
 
-const providerRegisterSchema = z
-  .object({
-    name: z.string().min(3, 'Name must be at least 3 characters'),
-    email: z.string().email('Enter a valid email address'),
-    password: z.string().min(6, 'Password must be at least 6 characters'),
-    confirmPassword: z.string(),
+const providerRegisterSchema = baseRegisterFields
+  .extend({
     specialty: z.string().optional(),
     bio: z.string().optional(),
     licenseNumber: z.string().optional(),
@@ -26,7 +22,7 @@ const providerRegisterSchema = z
       .union([z.literal(''), z.coerce.number().int().min(1, 'Must be at least 1 minute')])
       .optional(),
   })
-  .refine((data) => data.password === data.confirmPassword, {
+  .refine(passwordsMatch, {
     message: 'Passwords do not match',
     path: ['confirmPassword'],
   });
@@ -34,22 +30,6 @@ const providerRegisterSchema = z
 type ProviderRegisterFormValues = z.infer<typeof providerRegisterSchema>;
 
 const OPTIONAL_PLACEHOLDER = 'You can update this from your profile later';
-
-const Logo = () => (
-  <div className="flex items-center gap-2 justify-center">
-    <div className="w-10 h-10 bg-[#164E63] rounded-xl flex items-center justify-center shadow-lg shadow-teal-900/10">
-      <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="16" cy="10" r="3" fill="#2DD4BF" />
-        <circle cx="10" cy="22" r="3" fill="#2DD4BF" />
-        <circle cx="22" cy="22" r="3" fill="#2DD4BF" />
-        <path d="M16 10L10 22M16 10L22 22M10 22L22 22" stroke="#2DD4BF" strokeWidth="2" />
-      </svg>
-    </div>
-    <span className="text-2xl font-bold tracking-tight text-slate-800">
-      Rhizo<span className="text-[#2DD4BF]">Book</span>
-    </span>
-  </div>
-);
 
 export default function ProviderRegisterPage() {
   const router = useRouter();
@@ -62,37 +42,7 @@ export default function ProviderRegisterPage() {
     resolver: zodResolver(providerRegisterSchema),
   });
 
-  const onSubmit = async (values: ProviderRegisterFormValues) => {
-    try {
-      await api.post('/auth/register', {
-        name: values.name,
-        email: values.email,
-        password: values.password,
-        roleId: 1, // provider
-      });
-
-      const result = await signIn('credentials', {
-        email: values.email,
-        password: values.password,
-        redirect: false,
-      });
-
-      if (result?.error) {
-        toast.error('Account created — please sign in.');
-        router.push('/login');
-      } else {
-        router.push('/dashboard');
-        router.refresh();
-      }
-    } catch (err: unknown) {
-      const message =
-        (err as { response?: { data?: { message?: string | string[] } } })
-          ?.response?.data?.message;
-      toast.error(
-        Array.isArray(message) ? message.join(', ') : (message ?? 'Registration failed. Please try again.')
-      );
-    }
-  };
+  const onSubmit = (values: ProviderRegisterFormValues) => submitRegistration(values, 1, router);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#F0FDF4] px-4 py-12 font-sans selection:bg-teal-100">
@@ -196,7 +146,7 @@ export default function ProviderRegisterPage() {
               {/* ── Practice Profile (optional) ── */}
               <div className="pt-2 border-t border-green-50">
                 <p className="text-[10px] font-black uppercase tracking-widest text-teal-600 mb-4">
-                  Practice Profile <span className="normal-case font-medium text-slate-400">(optional)</span>
+                  Practice Profile <span className="normal-case font-medium text-red-400">(Not Yet Implemented)</span>
                 </p>
 
                 <div className="space-y-5">
@@ -265,6 +215,7 @@ export default function ProviderRegisterPage() {
               <Button
                 type="submit"
                 disabled={isSubmitting}
+                suppressHydrationWarning
                 className="w-full bg-[#2DD4BF] hover:bg-teal-500 text-[#164E63] font-black rounded-2xl py-6 text-base shadow-lg active:scale-95 transition-all"
               >
                 {isSubmitting ? 'Creating account…' : 'JOIN AS A PROVIDER'}

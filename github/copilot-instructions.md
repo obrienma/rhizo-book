@@ -6,7 +6,7 @@
 # TypeScript
 - Use TypeScript strict mode
 - Prefer `const` over `let`
-- Add `suppressHydrationWarning` only to Input components that could be polluted by password managers
+- Add `suppressHydrationWarning` to Input and Button (submit) components in auth forms that could be polluted by password managers
 
 # /frontend
 - base branding and styles follow and build upon the conventions in app/(marketing) and app/register
