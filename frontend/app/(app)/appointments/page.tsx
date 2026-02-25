@@ -41,7 +41,7 @@ export default function AppointmentsPage() {
 
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<string>('ALL');
+  const [filter, setFilter] = useState<string>('SCHEDULED');
 
   // Cancel dialog state
   const [cancelId, setCancelId] = useState<number | null>(null);
@@ -85,91 +85,129 @@ export default function AppointmentsPage() {
   const displayed = filter === 'ALL' ? appointments : appointments.filter((a) => a.status === filter);
 
   return (
-    <div className="container mx-auto py-8">
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Appointments</h1>
+    <div className="max-w-6xl mx-auto">
+      <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div>
+          <h1 className="text-4xl font-black text-slate-900 tracking-tight">Appointments</h1>
+          <p className="text-slate-500 font-medium mt-1">Manage and track your healthcare schedule.</p>
+        </div>
         {!isProvider && (
           <Link href="/providers">
-            <Button>Book New Appointment</Button>
+            <Button className="px-8 py-6 rounded-2xl bg-[#164E63] text-white font-bold hover:bg-slate-800 transition-all shadow-lg shadow-teal-900/10 active:scale-95">
+              Book New Appointment
+            </Button>
           </Link>
         )}
       </div>
 
       {/* Filter tabs */}
-      <div className="mb-6 flex gap-2">
+      <div className="mb-8 flex flex-wrap gap-2">
         {['ALL', 'SCHEDULED', 'COMPLETED', 'CANCELLED', 'NO_SHOW'].map((s) => (
           <button
             key={s}
             onClick={() => setFilter(s)}
-            className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
-              filter === s ? 'bg-primary text-primary-foreground' : 'hover:bg-muted border'
+            className={`px-5 py-2 rounded-full text-xs font-black uppercase tracking-widest transition-all ${
+              filter === s
+                ? 'bg-teal-600 text-white shadow-md shadow-teal-600/20'
+                : 'bg-white text-slate-500 hover:bg-teal-50 border border-green-50'
             }`}
           >
-            {s === 'ALL' ? 'All' : s.charAt(0) + s.slice(1).toLowerCase().replace('_', ' ')}
+            {s === 'ALL' ? 'All' : s.replace('_', ' ')}
           </button>
         ))}
       </div>
 
       {loading ? (
-        <p>Loading...</p>
+        <div className="flex flex-col items-center justify-center py-20 text-slate-400">
+          <div className="w-10 h-10 border-4 border-teal-600 border-t-transparent rounded-full animate-spin mb-4"></div>
+          <p className="font-bold">Syncing your schedule...</p>
+        </div>
       ) : displayed.length === 0 ? (
-        <Card>
-          <CardContent className="py-8 text-center text-gray-500">
-            No appointments found.{' '}
-            {!isProvider && (
-              <Link href="/providers" className="text-primary underline">
-                Book one now
-              </Link>
-            )}
+        <Card className="rounded-[2.5rem] border border-green-50 shadow-xl shadow-emerald-900/5 bg-white/50 backdrop-blur-sm py-20">
+          <CardContent className="flex flex-col items-center text-center">
+            <div className="w-20 h-20 bg-teal-50 rounded-3xl flex items-center justify-center text-4xl mb-6">🗓️</div>
+            <h3 className="text-xl font-bold text-slate-800">No appointments found</h3>
+            <p className="text-slate-500 mt-2 max-w-xs">
+              {!isProvider ? (
+                <>Try adjusting your filters or <Link href="/providers" className="text-teal-600 underline font-bold">book a new appointment</Link> to get started.</>
+              ) : (
+                <>Try adjusting your filters to see more appointments.</>
+              )}
+            </p>
           </CardContent>
         </Card>
       ) : (
-        <div className="space-y-4">
+        <div className="grid gap-6">
           {displayed.map((appt) => (
-            <Card key={appt.id}>
-              <CardHeader className="pb-2">
-                <div className="flex items-start justify-between">
-                  <CardTitle className="text-base font-semibold">
-                    {isProvider ? appt.patient.name : `Dr. ${appt.provider.name}`}
-                  </CardTitle>
-                  <span
-                    className={`rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_STYLES[appt.status] ?? ''}`}
-                  >
-                    {appt.status}
-                  </span>
+            <Card key={appt.id} className="rounded-[2rem] border border-green-50 shadow-xl shadow-emerald-900/5 hover:shadow-emerald-900/10 transition-all overflow-hidden bg-white group">
+              <CardContent className="p-0 text-slate-600">
+                <div className="flex flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-green-50">
+                  {/* Time Info */}
+                  <div className="p-8 md:w-64 bg-slate-50/50 flex flex-col justify-center">
+                    <div className="text-[10px] font-black uppercase tracking-widest text-teal-600 mb-2">DATE & TIME</div>
+                    <div className="text-lg font-black text-slate-800 leading-tight">
+                      {new Date(appt.startTime).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric',
+                      })}
+                    </div>
+                    <div className="text-slate-500 font-bold mt-1">
+                      {new Date(appt.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </div>
+                  </div>
+
+                  {/* Details */}
+                  <div className="p-8 flex-1 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                    <div className="flex items-center gap-5">
+                      <div className="w-16 h-16 bg-white border border-green-100 rounded-2xl flex items-center justify-center text-2xl shadow-sm group-hover:scale-110 transition-transform">
+                        {isProvider ? '👤' : '👨‍⚕️'}
+                      </div>
+                      <div>
+                        <div className="text-[10px] font-black uppercase tracking-widest text-teal-600 mb-1">
+                          {isProvider ? 'PATIENT' : 'PROVIDER'}
+                        </div>
+                        <h3 className="text-xl font-black text-slate-800">
+                          {isProvider ? appt.patient.name : `Dr. ${appt.provider.name}`}
+                        </h3>
+                        <p className="text-sm text-slate-500 font-medium">{isProvider ? appt.patient.email : appt.provider.email}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col md:items-end gap-4">
+                      <span className={`px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest uppercase ${STATUS_STYLES[appt.status] ?? ''}`}>
+                        {appt.status}
+                      </span>
+                      {appt.status === 'SCHEDULED' && (
+                        <Button
+                          variant="ghost"
+                          onClick={() => {
+                            setCancelId(appt.id);
+                            setCancelReason('');
+                          }}
+                          className="text-red-500 hover:text-red-600 hover:bg-red-50 rounded-xl font-bold text-sm px-4"
+                        >
+                          Cancel Appointment
+                        </Button>
+                      )}
+                    </div>
+                  </div>
                 </div>
-              </CardHeader>
-              <CardContent className="space-y-1 text-sm text-gray-600">
-                <p>
-                  <span className="font-medium">Time: </span>
-                  {new Date(appt.startTime).toLocaleString()} –{' '}
-                  {new Date(appt.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                </p>
-                {appt.notes && (
-                  <p>
-                    <span className="font-medium">Notes: </span>
-                    {appt.notes}
-                  </p>
-                )}
-                {appt.cancellationReason && (
-                  <p>
-                    <span className="font-medium">Cancellation reason: </span>
-                    {appt.cancellationReason}
-                  </p>
-                )}
-                {appt.status === 'SCHEDULED' && (
-                  <div className="pt-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="border-red-300 text-red-600 hover:bg-red-50"
-                      onClick={() => {
-                        setCancelId(appt.id);
-                        setCancelReason('');
-                      }}
-                    >
-                      Cancel Appointment
-                    </Button>
+
+                {(appt.notes || appt.cancellationReason) && (
+                  <div className="px-8 pb-8 pt-0 flex flex-col gap-2">
+                    {appt.notes && (
+                      <div className="bg-slate-50 rounded-xl p-4 border border-slate-100/50">
+                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1">Notes</span>
+                        <p className="text-sm font-medium text-slate-600">{appt.notes}</p>
+                      </div>
+                    )}
+                    {appt.cancellationReason && (
+                      <div className="bg-red-50/50 rounded-xl p-4 border border-red-100/50">
+                        <span className="text-[10px] font-black uppercase tracking-widest text-red-400 block mb-1">Cancellation Reason</span>
+                        <p className="text-sm font-medium text-red-600 italic">"{appt.cancellationReason}"</p>
+                      </div>
+                    )}
                   </div>
                 )}
               </CardContent>
@@ -180,29 +218,44 @@ export default function AppointmentsPage() {
 
       {/* Cancel dialog */}
       <Dialog open={cancelId !== null} onOpenChange={(open) => !open && setCancelId(null)}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Cancel Appointment</DialogTitle>
+        <DialogContent className="rounded-[2rem] border-none shadow-2xl p-8 max-w-md">
+          <DialogHeader className="text-center pb-2">
+            <div className="w-16 h-16 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4">⚠️</div>
+            <DialogTitle className="text-2xl font-black text-slate-900">Cancel Appointment?</DialogTitle>
           </DialogHeader>
-          <div className="space-y-3 py-2">
-            <Label htmlFor="cancel-reason">Reason (optional)</Label>
-            <Input
-              id="cancel-reason"
-              placeholder="e.g. Schedule conflict"
-              value={cancelReason}
-              onChange={(e) => setCancelReason(e.target.value)}
-            />
+          <div className="space-y-4 py-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="cancel-reason" className="text-[10px] font-black uppercase tracking-widest text-teal-600">
+                Reason (optional)
+              </Label>
+              <Input
+                id="cancel-reason"
+                placeholder="e.g. Schedule conflict"
+                className="font-semibold text-slate-800 placeholder:text-slate-300"
+                value={cancelReason}
+                onChange={(e) => setCancelReason(e.target.value)}
+              />
+            </div>
+            <p className="text-sm text-slate-500 font-medium text-center">
+              Are you sure you want to cancel? This action cannot be undone.
+            </p>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setCancelId(null)} disabled={cancelling}>
-              Keep Appointment
-            </Button>
+          <DialogFooter className="flex-col sm:flex-col gap-3">
             <Button
               variant="destructive"
               onClick={handleCancel}
               disabled={cancelling}
+              className="w-full py-6 rounded-2xl font-bold shadow-lg shadow-red-900/10"
             >
-              {cancelling ? 'Cancelling...' : 'Yes, Cancel'}
+              {cancelling ? 'Cancelling...' : 'Yes, Cancel Appointment'}
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={() => setCancelId(null)}
+              disabled={cancelling}
+              className="w-full py-6 rounded-2xl font-bold text-slate-500 hover:bg-slate-50"
+            >
+              No, Keep It
             </Button>
           </DialogFooter>
         </DialogContent>
