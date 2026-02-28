@@ -62,11 +62,11 @@ export class AppointmentsController {
       'Returns all appointments belonging to the authenticated user. ' +
       'Providers see appointments where they are the provider; ' +
       'patients see appointments where they are the patient. ' +
-      'Results are ordered by startTime descending.',
+      'Results are ordered by startTime ascending.',
   })
   @ApiResponse({
     status: 200,
-    description: 'Array of appointment objects ordered by startTime descending.',
+    description: 'Array of appointment objects ordered by startTime ascending.',
     type: AppointmentEntity,
     isArray: true,
   })

@@ -75,7 +75,7 @@ export class AppointmentsService {
           select: { id: true, name: true, email: true },
         },
       },
-      orderBy: { startTime: 'desc' },
+      orderBy: { startTime: 'asc' },
     });
   }
 
