@@ -5,23 +5,28 @@ import { PrismaService } from '../prisma/prisma.service';
 export class ProvidersService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll() {
+  async findAll(specialty?: string) {
     return this.prisma.user.findMany({
       where: {
         role: { name: 'provider' },
+        ...(specialty
+          ? {
+              providerProfile: {
+                specialty: { contains: specialty, mode: 'insensitive' },
+              },
+            }
+          : {}),
       },
-      // include: {
-      //   providerProfile: {
-      //     include: {
-      //       availabilitySlots: true,
-      //     },
-      //   },
-      // },
       select: {
         id: true,
         name: true,
-        email: true,
-        providerProfile: true,
+        providerProfile: {
+          select: {
+            specialty: true,
+            bio: true,
+            appointmentDuration: true,
+          },
+        },
       },
     });
   }
@@ -35,12 +40,20 @@ export class ProvidersService {
       select: {
         id: true,
         name: true,
-        email: true,
         providerProfile: {
-          include: {
+          select: {
+            specialty: true,
+            bio: true,
+            appointmentDuration: true,
             availabilitySlots: {
               where: { isActive: true },
               orderBy: [{ dayOfWeek: 'asc' }, { startTime: 'asc' }],
+              select: {
+                id: true,
+                dayOfWeek: true,
+                startTime: true,
+                endTime: true,
+              },
             },
           },
         },

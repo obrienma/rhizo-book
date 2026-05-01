@@ -26,7 +26,7 @@ describe('ProvidersService', () => {
   });
 
   describe('findAll', () => {
-    it('should return all users with provider role', async () => {
+    it('should return all providers when no specialty is given', async () => {
       const providers = [
         { id: 1, name: 'Dr. A', email: 'a@test.com', providerProfile: {} },
         { id: 2, name: 'Dr. B', email: 'b@test.com', providerProfile: {} },
@@ -43,6 +43,23 @@ describe('ProvidersService', () => {
       );
     });
 
+    it('should filter by specialty when provided', async () => {
+      prisma.user.findMany.mockResolvedValue([]);
+
+      await service.findAll('cardiology');
+
+      expect(prisma.user.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: {
+            role: { name: 'provider' },
+            providerProfile: {
+              specialty: { contains: 'cardiology', mode: 'insensitive' },
+            },
+          },
+        }),
+      );
+    });
+
     it('should return empty array when no providers exist', async () => {
       prisma.user.findMany.mockResolvedValue([]);
 
@@ -51,7 +68,7 @@ describe('ProvidersService', () => {
       expect(result).toEqual([]);
     });
 
-    it('should select only id, name, email, and providerProfile', async () => {
+    it('should select only public fields and omit email and licenseNumber', async () => {
       prisma.user.findMany.mockResolvedValue([]);
 
       await service.findAll();
@@ -61,8 +78,13 @@ describe('ProvidersService', () => {
           select: {
             id: true,
             name: true,
-            email: true,
-            providerProfile: true,
+            providerProfile: {
+              select: {
+                specialty: true,
+                bio: true,
+                appointmentDuration: true,
+              },
+            },
           },
         }),
       );
@@ -106,7 +128,7 @@ describe('ProvidersService', () => {
       await service.findOne(7);
 
       const call = prisma.user.findFirst.mock.calls[0][0];
-      expect(call.select.providerProfile.include.availabilitySlots.where).toEqual({
+      expect(call.select.providerProfile.select.availabilitySlots.where).toEqual({
         isActive: true,
       });
     });
@@ -117,10 +139,47 @@ describe('ProvidersService', () => {
       await service.findOne(7);
 
       const call = prisma.user.findFirst.mock.calls[0][0];
-      expect(call.select.providerProfile.include.availabilitySlots.orderBy).toEqual([
+      expect(call.select.providerProfile.select.availabilitySlots.orderBy).toEqual([
         { dayOfWeek: 'asc' },
         { startTime: 'asc' },
       ]);
+    });
+
+    it('should not expose email or licenseNumber', async () => {
+      prisma.user.findFirst.mockResolvedValue({ id: 7 });
+
+      await service.findOne(7);
+
+      const { select } = prisma.user.findFirst.mock.calls[0][0];
+      expect(select).not.toHaveProperty('email');
+      expect(select.providerProfile.select).not.toHaveProperty('licenseNumber');
+    });
+
+    it('should select only public fields from providerProfile', async () => {
+      prisma.user.findFirst.mockResolvedValue({ id: 7 });
+
+      await service.findOne(7);
+
+      const { select } = prisma.user.findFirst.mock.calls[0][0];
+      expect(Object.keys(select)).toEqual(['id', 'name', 'providerProfile']);
+      expect(Object.keys(select.providerProfile.select)).toEqual([
+        'specialty', 'bio', 'appointmentDuration', 'availabilitySlots',
+      ]);
+    });
+
+    it('should select only public fields from availability slots', async () => {
+      prisma.user.findFirst.mockResolvedValue({ id: 7 });
+
+      await service.findOne(7);
+
+      const slotSelect =
+        prisma.user.findFirst.mock.calls[0][0].select.providerProfile.select.availabilitySlots.select;
+      expect(slotSelect).toEqual({
+        id: true,
+        dayOfWeek: true,
+        startTime: true,
+        endTime: true,
+      });
     });
   });
 });

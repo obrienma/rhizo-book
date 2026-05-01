@@ -1,7 +1,7 @@
 'use client';
 
 import { signIn } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -21,6 +21,8 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get('callbackUrl') ?? '/dashboard';
 
   const {
     register,
@@ -41,7 +43,7 @@ export default function LoginPage() {
     if (result?.error) {
       setError('root', { message: 'Incorrect email or password. Please try again.' });
     } else {
-      router.push('/dashboard');
+      router.push(callbackUrl);
       router.refresh();
     }
   };

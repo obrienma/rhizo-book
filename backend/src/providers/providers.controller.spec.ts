@@ -25,14 +25,22 @@ describe('ProvidersController', () => {
   });
 
   describe('findAll', () => {
-    it('should return all providers', async () => {
+    it('should return all providers without specialty filter', async () => {
       const providers = [{ id: 1, name: 'Dr. A' }];
       service.findAll.mockResolvedValue(providers);
 
-      const result = await controller.findAll();
+      const result = await controller.findAll(undefined);
 
       expect(result).toEqual(providers);
-      expect(service.findAll).toHaveBeenCalled();
+      expect(service.findAll).toHaveBeenCalledWith(undefined);
+    });
+
+    it('should pass specialty filter to service', async () => {
+      service.findAll.mockResolvedValue([]);
+
+      await controller.findAll('cardiology');
+
+      expect(service.findAll).toHaveBeenCalledWith('cardiology');
     });
   });
 

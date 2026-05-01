@@ -9,7 +9,30 @@ export default function Navigation() {
   const { data: session } = useSession();
 
   if (!session) {
-    return null;
+    return (
+      <nav className="bg-white/70 backdrop-blur-md sticky top-0 z-50 border-b border-green-100">
+        <div className="max-w-7xl mx-auto px-4 md:px-8">
+          <div className="flex items-center justify-between h-20">
+            <Link href="/" className="transition hover:opacity-90">
+              <Logo />
+            </Link>
+            <div className="flex items-center gap-6">
+              <Link
+                href="/providers"
+                className="text-sm font-semibold text-slate-600 hover:text-teal-600 transition"
+              >
+                Find Care
+              </Link>
+              <Link href="/login">
+                <Button className="px-6 py-2.5 rounded-full bg-[#164E63] text-white text-sm font-bold hover:bg-slate-800 transition-all shadow-md active:scale-95">
+                  Sign In
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </nav>
+    );
   }
 
   return (
@@ -54,7 +77,7 @@ export default function Navigation() {
             </div>
             <Button
               variant="outline"
-              onClick={() => signOut({ callbackUrl: '/' })}
+              onClick={() => signOut({ callbackUrl: window.location.origin })}
               className="px-6 py-2.5 rounded-full border-2 border-slate-200 text-slate-600 text-sm font-bold hover:bg-slate-50 transition-all active:scale-95"
             >
               Sign Out

@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 // Simplified Logo Component for the Navbar
 const Logo = () => (
@@ -21,8 +22,15 @@ const Logo = () => (
 );
 
 const LandingPage: React.FC = () => {
-  const [search, setSearch] = useState({ specialty: '', location: '' });
+  const router = useRouter();
+  const [search, setSearch] = useState({ specialty: '' });
   const [menuOpen, setMenuOpen] = useState(false);
+
+  const handleFindCare = () => {
+    const params = new URLSearchParams();
+    if (search.specialty) params.set('specialty', search.specialty);
+    router.push(`/providers${params.size ? `?${params}` : ''}`);
+  };
 
   return (
     <div className="min-h-screen bg-[#F0FDF4] font-sans selection:bg-teal-100">
@@ -34,7 +42,7 @@ const LandingPage: React.FC = () => {
           {/* Desktop nav links */}
           <div className="hidden md:flex items-center gap-8">
             <a href="#how-it-works" className="text-sm font-semibold text-slate-600 hover:text-teal-600 transition">How it Works</a>
-            <a href="#providers" className="text-sm font-semibold text-slate-600 hover:text-teal-600 transition">Browse Providers</a>
+            <Link href="/providers" className="text-sm font-semibold text-slate-600 hover:text-teal-600 transition">Browse Providers</Link>
             <div className="h-5 w-px bg-slate-200"></div>
             <a
               href="/login"
@@ -80,13 +88,13 @@ const LandingPage: React.FC = () => {
             >
               How it Works
             </a>
-            <a
-              href="#providers"
+            <Link
+              href="/providers"
               onClick={() => setMenuOpen(false)}
               className="text-sm font-semibold text-slate-600 hover:text-teal-600 transition"
             >
               Browse Providers
-            </a>
+            </Link>
           </div>
         )}
       </nav>
@@ -114,16 +122,10 @@ const LandingPage: React.FC = () => {
                 onChange={(e) => setSearch({ ...search, specialty: e.target.value })}
               />
             </div>
-            <div className="flex-1 px-6 py-4 flex flex-col items-start">
-              <label className="text-[10px] font-black uppercase tracking-widest text-teal-600 mb-1">Near You</label>
-              <input
-                type="text"
-                placeholder="City or Zip"
-                className="w-full outline-none text-slate-800 placeholder:text-slate-300 font-semibold"
-                onChange={(e) => setSearch({ ...search, location: e.target.value })}
-              />
-            </div>
-            <button className="bg-[#2DD4BF] hover:bg-teal-500 text-[#164E63] px-10 py-5 rounded-2xl font-black transition-all shadow-lg active:scale-95">
+            <button
+              onClick={handleFindCare}
+              className="bg-[#2DD4BF] hover:bg-teal-500 text-[#164E63] px-10 py-5 rounded-2xl font-black transition-all shadow-lg active:scale-95"
+            >
               FIND CARE
             </button>
           </div>

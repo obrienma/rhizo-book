@@ -2,8 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
+import Link from 'next/link';
+import axios from 'axios';
 import api from '@/lib/api';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -21,7 +24,6 @@ interface AvailabilitySlot {
 interface Provider {
   id: number;
   name: string;
-  email: string;
   providerProfile: {
     specialty: string | null;
     bio: string | null;
@@ -30,11 +32,7 @@ interface Provider {
   } | null;
 }
 
-function generateTimeSlots(
-  slotStart: string,
-  slotEnd: string,
-  durationMinutes: number,
-): string[] {
+function generateTimeSlots(slotStart: string, slotEnd: string, durationMinutes: number): string[] {
   const times: string[] = [];
   const [startH, startM] = slotStart.split(':').map(Number);
   const [endH, endM] = slotEnd.split(':').map(Number);
@@ -52,6 +50,7 @@ function generateTimeSlots(
 export default function ProviderDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
+  const { data: session } = useSession();
 
   const [provider, setProvider] = useState<Provider | null>(null);
   const [loading, setLoading] = useState(true);
@@ -63,7 +62,7 @@ export default function ProviderDetailPage() {
   useEffect(() => {
     const fetchProvider = async () => {
       try {
-        const res = await api.get(`/providers/${id}`);
+        const res = await axios.get(`/v1/providers/${id}`);
         setProvider(res.data);
       } catch {
         toast.error('Provider not found');
@@ -80,9 +79,7 @@ export default function ProviderDetailPage() {
     const date = new Date(selectedDate + 'T00:00:00');
     const dayOfWeek = date.getDay();
     const duration = provider.providerProfile.appointmentDuration;
-    const slots = provider.providerProfile.availabilitySlots.filter(
-      (s) => s.dayOfWeek === dayOfWeek,
-    );
+    const slots = provider.providerProfile.availabilitySlots.filter((s) => s.dayOfWeek === dayOfWeek);
     return slots.flatMap((s) => generateTimeSlots(s.startTime, s.endTime, duration));
   };
 
@@ -95,12 +92,7 @@ export default function ProviderDetailPage() {
 
     setBooking(true);
     try {
-      await api.post('/appointments', {
-        providerId: provider.id,
-        startTime,
-        endTime,
-        notes: notes || undefined,
-      });
+      await api.post('/appointments', { providerId: provider.id, startTime, endTime, notes: notes || undefined });
       toast.success('Appointment booked successfully!');
       router.push('/appointments');
     } catch (err: unknown) {
@@ -114,7 +106,12 @@ export default function ProviderDetailPage() {
   };
 
   if (loading) {
-    return <div className="container mx-auto py-8">Loading...</div>;
+    return (
+      <div className="flex flex-col items-center justify-center py-20 text-slate-400">
+        <div className="w-10 h-10 border-4 border-teal-600 border-t-transparent rounded-full animate-spin mb-4"></div>
+        <p className="font-bold">Loading provider...</p>
+      </div>
+    );
   }
 
   if (!provider) return null;
@@ -132,8 +129,14 @@ export default function ProviderDetailPage() {
           >
             <span className="group-hover:-translate-x-1 transition-transform">←</span> Back to Providers
           </button>
-          <h1 className="text-4xl font-black text-slate-900 tracking-tight">Book an Appointment</h1>
-          <p className="text-slate-500 font-medium mt-1">Select a comfortable time for your visit with Dr. {provider.name}.</p>
+          <h1 className="text-4xl font-black text-slate-900 tracking-tight">
+            {session ? 'Book an Appointment' : 'Provider Details'}
+          </h1>
+          <p className="text-slate-500 font-medium mt-1">
+            {session
+              ? `Select a comfortable time for your visit with Dr. ${provider.name}.`
+              : `Learn about Dr. ${provider.name} and their availability.`}
+          </p>
         </div>
       </div>
 
@@ -182,95 +185,117 @@ export default function ProviderDetailPage() {
           </Card>
         </div>
 
-        {/* Booking form */}
+        {/* Booking form (authenticated) or Sign-in prompt (unauthenticated) */}
         <div className="lg:col-span-3">
-          <Card className="rounded-[3rem] border-2 border-teal-100 shadow-2xl shadow-emerald-900/10 bg-white p-2">
-            <div className="bg-[#164E63] rounded-[2.5rem] p-8 md:p-10">
-              <h3 className="text-2xl font-black text-white mb-8">Schedule your visit</h3>
+          {session ? (
+            <Card className="rounded-[3rem] border-2 border-teal-100 shadow-2xl shadow-emerald-900/10 bg-white p-2">
+              <div className="bg-[#164E63] rounded-[2.5rem] p-8 md:p-10">
+                <h3 className="text-2xl font-black text-white mb-8">Schedule your visit</h3>
 
-              <div className="space-y-8">
-                {/* Date Picker */}
-                <div className="space-y-2">
-                  <Label htmlFor="date" className="text-[10px] font-black uppercase tracking-widest text-teal-400">
-                    1. Select a Date
-                  </Label>
-                  <div className="relative">
+                <div className="space-y-8">
+                  <div className="space-y-2">
+                    <Label htmlFor="date" className="text-[10px] font-black uppercase tracking-widest text-teal-400">
+                      1. Select a Date
+                    </Label>
                     <Input
                       id="date"
                       type="date"
                       min={todayIso}
                       value={selectedDate}
-                      onChange={(e) => {
-                        setSelectedDate(e.target.value);
-                        setSelectedTime('');
-                      }}
+                      onChange={(e) => { setSelectedDate(e.target.value); setSelectedTime(''); }}
                       className="bg-white/10 border-white/20 text-white font-bold h-14 rounded-2xl [color-scheme:dark] px-6 focus:ring-teal-400"
                     />
                   </div>
-                </div>
 
-                {/* Time Picker */}
-                {selectedDate && (
-                  <div className="space-y-4 animate-in fade-in slide-in-from-top-4">
-                    <Label className="text-[10px] font-black uppercase tracking-widest text-teal-400">
-                      2. Choose an Available Time
+                  {selectedDate && (
+                    <div className="space-y-4 animate-in fade-in slide-in-from-top-4">
+                      <Label className="text-[10px] font-black uppercase tracking-widest text-teal-400">
+                        2. Choose an Available Time
+                      </Label>
+                      {timeslots.length === 0 ? (
+                        <div className="p-6 rounded-2xl bg-white/5 border border-white/10 text-center">
+                          <p className="text-white/60 font-medium">No slots available on this day.</p>
+                        </div>
+                      ) : (
+                        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
+                          {timeslots.map((time) => (
+                            <button
+                              key={time}
+                              type="button"
+                              onClick={() => setSelectedTime(time)}
+                              className={`h-12 rounded-xl text-sm font-black transition-all ${
+                                selectedTime === time
+                                  ? 'bg-teal-400 text-[#164E63] shadow-lg shadow-teal-400/20'
+                                  : 'bg-white/5 text-white hover:bg-white/10 border border-white/10'
+                              }`}
+                            >
+                              {time}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  <div className="space-y-2">
+                    <Label htmlFor="notes" className="text-[10px] font-black uppercase tracking-widest text-teal-400">
+                      3. Additional Information
                     </Label>
-                    {timeslots.length === 0 ? (
-                      <div className="p-6 rounded-2xl bg-white/5 border border-white/10 text-center">
-                        <p className="text-white/60 font-medium">
-                          No slots available on this day.
-                        </p>
-                      </div>
-                    ) : (
-                      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
-                        {timeslots.map((time) => (
-                          <button
-                            key={time}
-                            type="button"
-                            onClick={() => setSelectedTime(time)}
-                            className={`h-12 rounded-xl text-sm font-black transition-all ${
-                              selectedTime === time
-                                ? 'bg-teal-400 text-[#164E63] shadow-lg shadow-teal-400/20'
-                                : 'bg-white/5 text-white hover:bg-white/10 border border-white/10'
-                            }`}
-                          >
-                            {time}
-                          </button>
-                        ))}
-                      </div>
-                    )}
+                    <Input
+                      id="notes"
+                      placeholder="Reason for visit..."
+                      value={notes}
+                      onChange={(e) => setNotes(e.target.value)}
+                      className="bg-white/10 border-white/20 text-white font-semibold h-14 rounded-2xl placeholder:text-white/30 px-6 focus:ring-teal-400"
+                    />
                   </div>
-                )}
 
-                {/* Notes */}
-                <div className="space-y-2">
-                  <Label htmlFor="notes" className="text-[10px] font-black uppercase tracking-widest text-teal-400">
-                    3. Additional Information
-                  </Label>
-                  <Input
-                    id="notes"
-                    placeholder="Reason for visit..."
-                    value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
-                    className="bg-white/10 border-white/20 text-white font-semibold h-14 rounded-2xl placeholder:text-white/30 px-6 focus:ring-teal-400"
-                  />
-                </div>
-
-                <Button
-                  className="w-full h-16 rounded-[1.5rem] bg-teal-400 text-[#164E63] text-lg font-black hover:bg-white hover:scale-[1.02] transition-all shadow-xl shadow-teal-900/40 disabled:opacity-50 disabled:hover:scale-100 mt-4"
-                  disabled={!selectedDate || !selectedTime || booking}
-                  onClick={handleBook}
-                >
-                  {booking ? 'Confirming...' : 'Complete Booking'}
-                </Button>
-                <div className="text-center">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-white/30">
-                    Secure 128-bit Encrypted Booking
-                  </p>
+                  <Button
+                    className="w-full h-16 rounded-[1.5rem] bg-teal-400 text-[#164E63] text-lg font-black hover:bg-white hover:scale-[1.02] transition-all shadow-xl shadow-teal-900/40 disabled:opacity-50 disabled:hover:scale-100 mt-4"
+                    disabled={!selectedDate || !selectedTime || booking}
+                    onClick={handleBook}
+                  >
+                    {booking ? 'Confirming...' : 'Complete Booking'}
+                  </Button>
+                  <div className="text-center">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-white/30">
+                      Secure 128-bit Encrypted Booking
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
-          </Card>
+            </Card>
+          ) : (
+            <Card className="rounded-[3rem] border-2 border-teal-100 shadow-2xl shadow-emerald-900/10 bg-white p-2">
+              <div className="bg-[#164E63] rounded-[2.5rem] p-8 md:p-10 flex flex-col items-center text-center gap-6">
+                <div className="w-20 h-20 bg-white/10 rounded-3xl flex items-center justify-center text-4xl">🔑</div>
+                <div>
+                  <h3 className="text-2xl font-black text-white mb-2">Ready to book?</h3>
+                  <p className="text-teal-200/80 font-medium leading-relaxed">
+                    Create a free account or sign in to book an appointment with Dr. {provider.name}.
+                  </p>
+                </div>
+                <div className="w-full flex flex-col gap-3">
+                  <Link href={`/login?callbackUrl=/providers/${provider.id}`} className="w-full">
+                    <Button className="w-full h-14 rounded-2xl bg-teal-400 text-[#164E63] text-base font-black hover:bg-white transition-all shadow-lg active:scale-95">
+                      Sign In to Book
+                    </Button>
+                  </Link>
+                  <Link href="/register" className="w-full">
+                    <Button
+                      variant="outline"
+                      className="w-full h-14 rounded-2xl border-2 border-white/20 text-white bg-transparent font-bold hover:bg-white/10 transition-all active:scale-95"
+                    >
+                      Create a Free Account
+                    </Button>
+                  </Link>
+                </div>
+                <p className="text-[10px] font-black uppercase tracking-widest text-white/30">
+                  Free to join · No credit card required
+                </p>
+              </div>
+            </Card>
+          )}
         </div>
       </div>
     </div>
