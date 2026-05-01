@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import axios from 'axios';
@@ -18,7 +18,7 @@ interface Provider {
   } | null;
 }
 
-export default function ProvidersPage() {
+function ProvidersContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -161,5 +161,13 @@ export default function ProvidersPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function ProvidersPage() {
+  return (
+    <Suspense>
+      <ProvidersContent />
+    </Suspense>
   );
 }
