@@ -31,6 +31,8 @@ npm run lint             # ESLint + fix
 npm run test             # unit tests
 npm run test:cov         # coverage
 
+./refresh-db.sh          # [Recommended] Hard reset of DB and re-seed (x5 data)
+
 npx prisma studio        # visual database browser
 npx prisma migrate dev   # apply + create migrations
 npx prisma db seed       # seed with sample data
@@ -53,7 +55,7 @@ src/
 prisma/
 ├── schema.prisma       Database schema
 ├── migrations/         Migration history
-└── seed.ts             Sample data (3 providers, 3 patients, 8 appointments)
+└── seed.ts             Sample data (27 providers, 28 patients, 73 appointments)
 ```
 
 ## Environment Variables
