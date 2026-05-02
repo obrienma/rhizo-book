@@ -39,10 +39,11 @@ PORT=3001
 ### Frontend — `frontend/.env.local`
 
 ```env
-NEXT_PUBLIC_API_URL=http://localhost:3001
-NEXTAUTH_URL=http://localhost:3000
+BACKEND_URL=http://localhost:3001
 NEXTAUTH_SECRET=change-this-to-a-long-random-string
 ```
+
+> `NEXTAUTH_URL` is not needed in development — Next.js auto-detects it from the request. Set it only in production (Vercel).
 
 ---
 
@@ -147,5 +148,5 @@ Ensure the JWT token in your session matches the `JWT_SECRET` in `backend/.env`.
 - Neon connections require `?sslmode=require` at the end of the URL
 
 ### Frontend shows blank page after login
-- Confirm `NEXT_PUBLIC_API_URL` in `frontend/.env.local` points to the running backend
+- Confirm `BACKEND_URL` in `frontend/.env.local` points to the running backend
 - Check the browser console for CORS or network errors

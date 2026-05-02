@@ -50,7 +50,7 @@ npx prisma db seed
 
 | Variable | Value |
 |----------|---------|
-| `NEXT_PUBLIC_API_URL` | `https://api.rhizobook.cyberrhizome.ca` |
+| `BACKEND_URL` | `https://api.rhizobook.cyberrhizome.ca` |
 | `NEXTAUTH_URL` | `https://rhizobook.cyberrhizome.ca` |
 | `NEXTAUTH_SECRET` | Long random string — must match across all frontend instances |
 

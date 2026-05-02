@@ -24,37 +24,50 @@ const makeSession = (roleName: string, name: string) => ({
 });
 
 describe('Navigation', () => {
-  it('renders nothing when unauthenticated', () => {
-    vi.mocked(useSession).mockReturnValue({ data: null, status: 'unauthenticated', update: vi.fn() });
-    const { container } = render(<Navigation />);
-    expect(container).toBeEmptyDOMElement();
+  describe('unauthenticated', () => {
+    beforeEach(() => {
+      vi.mocked(useSession).mockReturnValue({ data: null, status: 'unauthenticated', update: vi.fn() });
+    });
+
+    it('renders Find Care and Sign In links', () => {
+      render(<Navigation />);
+      expect(screen.getByRole('link', { name: /find care/i })).toBeInTheDocument();
+      expect(screen.getByRole('link', { name: /sign in/i })).toBeInTheDocument();
+    });
+
+    it('does not show Sign Out button', () => {
+      render(<Navigation />);
+      expect(screen.queryByRole('button', { name: /sign out/i })).not.toBeInTheDocument();
+    });
   });
 
-  it('shows app name, Dashboard link, user name and Sign Out when authenticated', () => {
-    vi.mocked(useSession).mockReturnValue(makeSession('provider', 'Dr. Smith'));
-    render(<Navigation />);
-    expect(screen.getByText('Health Scheduler')).toBeInTheDocument();
-    expect(screen.getByText('Dashboard')).toBeInTheDocument();
-    expect(screen.getByText('Dr. Smith')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /sign out/i })).toBeInTheDocument();
-  });
+  describe('authenticated', () => {
+    it('shows Dashboard, Appointments, user name and Sign Out', () => {
+      vi.mocked(useSession).mockReturnValue(makeSession('provider', 'Dr. Smith'));
+      render(<Navigation />);
+      expect(screen.getByRole('link', { name: /dashboard/i })).toBeInTheDocument();
+      expect(screen.getByRole('link', { name: /appointments/i })).toBeInTheDocument();
+      expect(screen.getByText('Dr. Smith')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /sign out/i })).toBeInTheDocument();
+    });
 
-  it('shows Providers link for patients', () => {
-    vi.mocked(useSession).mockReturnValue(makeSession('patient', 'Jane'));
-    render(<Navigation />);
-    expect(screen.getByText('Providers')).toBeInTheDocument();
-  });
+    it('shows Find Care link for patients', () => {
+      vi.mocked(useSession).mockReturnValue(makeSession('patient', 'Jane'));
+      render(<Navigation />);
+      expect(screen.getByRole('link', { name: /find care/i })).toBeInTheDocument();
+    });
 
-  it('hides Providers link for providers', () => {
-    vi.mocked(useSession).mockReturnValue(makeSession('provider', 'Dr. Smith'));
-    render(<Navigation />);
-    expect(screen.queryByText('Providers')).not.toBeInTheDocument();
-  });
+    it('hides Find Care link for providers', () => {
+      vi.mocked(useSession).mockReturnValue(makeSession('provider', 'Dr. Smith'));
+      render(<Navigation />);
+      expect(screen.queryByRole('link', { name: /find care/i })).not.toBeInTheDocument();
+    });
 
-  it('calls signOut when Sign Out is clicked', async () => {
-    vi.mocked(useSession).mockReturnValue(makeSession('patient', 'Jane'));
-    render(<Navigation />);
-    await userEvent.click(screen.getByRole('button', { name: /sign out/i }));
-    expect(signOut).toHaveBeenCalledWith({ callbackUrl: '/' });
+    it('calls signOut with window.location.origin as callbackUrl', async () => {
+      vi.mocked(useSession).mockReturnValue(makeSession('patient', 'Jane'));
+      render(<Navigation />);
+      await userEvent.click(screen.getByRole('button', { name: /sign out/i }));
+      expect(signOut).toHaveBeenCalledWith({ callbackUrl: window.location.origin });
+    });
   });
 });

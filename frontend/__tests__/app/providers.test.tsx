@@ -1,9 +1,14 @@
 import { render, screen, waitFor } from '@testing-library/react';
-import api from '@/lib/api';
+import axios from 'axios';
 import ProvidersPage from '@/app/(app)/providers/page';
 
-vi.mock('@/lib/api', () => ({
+vi.mock('axios', () => ({
   default: { get: vi.fn() },
+}));
+
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ push: vi.fn() }),
+  useSearchParams: () => new URLSearchParams(),
 }));
 
 vi.mock('next/link', () => ({
@@ -12,22 +17,23 @@ vi.mock('next/link', () => ({
   ),
 }));
 
+beforeEach(() => vi.resetAllMocks());
+
 const makeProvider = (id: number, name: string, specialty: string | null, bio: string | null) => ({
   id,
   name,
-  email: `${name.toLowerCase()}@test.com`,
-  providerProfile: specialty ? { specialty, bio } : null,
+  providerProfile: specialty ? { specialty, bio, appointmentDuration: 30 } : null,
 });
 
 describe('ProvidersPage', () => {
   it('shows loading state initially', () => {
-    vi.mocked(api.get).mockReturnValue(new Promise(() => {}));
+    vi.mocked(axios.get).mockReturnValue(new Promise(() => {}));
     render(<ProvidersPage />);
-    expect(screen.getByText(/loading providers/i)).toBeInTheDocument();
+    expect(screen.getByText(/finding best-in-class care/i)).toBeInTheDocument();
   });
 
   it('renders provider cards with name and specialty', async () => {
-    vi.mocked(api.get).mockResolvedValue({
+    vi.mocked(axios.get).mockResolvedValue({
       data: [makeProvider(1, 'Adams', 'Cardiology', 'Expert cardiologist with over 20 years of experience.')],
     });
     render(<ProvidersPage />);
@@ -36,7 +42,7 @@ describe('ProvidersPage', () => {
   });
 
   it('falls back to "General Practice" when providerProfile is null', async () => {
-    vi.mocked(api.get).mockResolvedValue({
+    vi.mocked(axios.get).mockResolvedValue({
       data: [makeProvider(2, 'Jones', null, null)],
     });
     render(<ProvidersPage />);
@@ -44,7 +50,7 @@ describe('ProvidersPage', () => {
   });
 
   it('renders a View Availability link pointing to the provider detail page', async () => {
-    vi.mocked(api.get).mockResolvedValue({
+    vi.mocked(axios.get).mockResolvedValue({
       data: [makeProvider(3, 'Chen', 'Pediatrics', 'Caring pediatrician focused on child development and wellbeing.')],
     });
     render(<ProvidersPage />);
@@ -54,7 +60,7 @@ describe('ProvidersPage', () => {
   });
 
   it('renders multiple provider cards', async () => {
-    vi.mocked(api.get).mockResolvedValue({
+    vi.mocked(axios.get).mockResolvedValue({
       data: [
         makeProvider(1, 'Adams', 'Cardiology', 'Cardiologist.'),
         makeProvider(2, 'Jones', 'Neurology', 'Neurologist.'),
