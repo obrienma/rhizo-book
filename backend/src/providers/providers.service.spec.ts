@@ -82,8 +82,62 @@ describe('ProvidersService', () => {
               select: {
                 specialty: true,
                 bio: true,
+                city: true,
+                province: true,
                 appointmentDuration: true,
               },
+            },
+          },
+        }),
+      );
+    });
+
+    it('should filter by city when provided', async () => {
+      prisma.user.findMany.mockResolvedValue([]);
+
+      await service.findAll(undefined, 'toronto');
+
+      expect(prisma.user.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: {
+            role: { name: 'provider' },
+            providerProfile: {
+              city: { contains: 'toronto', mode: 'insensitive' },
+            },
+          },
+        }),
+      );
+    });
+
+    it('should filter by province when provided', async () => {
+      prisma.user.findMany.mockResolvedValue([]);
+
+      await service.findAll(undefined, undefined, 'ON');
+
+      expect(prisma.user.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: {
+            role: { name: 'provider' },
+            providerProfile: {
+              province: { contains: 'ON', mode: 'insensitive' },
+            },
+          },
+        }),
+      );
+    });
+
+    it('should filter by specialty and city together', async () => {
+      prisma.user.findMany.mockResolvedValue([]);
+
+      await service.findAll('cardiology', 'toronto');
+
+      expect(prisma.user.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: {
+            role: { name: 'provider' },
+            providerProfile: {
+              specialty: { contains: 'cardiology', mode: 'insensitive' },
+              city: { contains: 'toronto', mode: 'insensitive' },
             },
           },
         }),
@@ -163,7 +217,7 @@ describe('ProvidersService', () => {
       const { select } = prisma.user.findFirst.mock.calls[0][0];
       expect(Object.keys(select)).toEqual(['id', 'name', 'providerProfile']);
       expect(Object.keys(select.providerProfile.select)).toEqual([
-        'specialty', 'bio', 'appointmentDuration', 'availabilitySlots',
+        'specialty', 'bio', 'city', 'province', 'appointmentDuration', 'availabilitySlots',
       ]);
     });
 

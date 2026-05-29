@@ -26,14 +26,28 @@ export class ProvidersController {
     required: false,
     description: 'Case-insensitive partial match on provider specialty',
   })
+  @ApiQuery({
+    name: 'city',
+    required: false,
+    description: 'Case-insensitive partial match on provider city',
+  })
+  @ApiQuery({
+    name: 'province',
+    required: false,
+    description: 'Case-insensitive partial match on provider province (e.g. ON)',
+  })
   @ApiResponse({
     status: 200,
     description: 'Array of provider objects with basic profile info.',
     type: ProviderEntity,
     isArray: true,
   })
-  findAll(@Query('specialty') specialty?: string) {
-    return this.providersService.findAll(specialty);
+  findAll(
+    @Query('specialty') specialty?: string,
+    @Query('city') city?: string,
+    @Query('province') province?: string,
+  ) {
+    return this.providersService.findAll(specialty, city, province);
   }
 
   @Get(':id')

@@ -4,6 +4,45 @@ Patterns, anti-patterns, challenges, and decisions encountered during developmen
 
 ---
 
+## 2026-05-29 — Location-Based Provider Search
+
+### Patterns
+
+**Q:** How do you extend a Prisma `findMany` to support multiple optional filters while keeping all conditions as an AND?
+**A:** Merge all field-level conditions into a single `providerProfile: { ...spread }` object using conditional spreads. Separate `providerProfile` keys at the same level create a TypeScript duplicate-key error and only the last one applies. One object, multiple conditional spreads inside it.
+
+**Q:** How should the `upsert` seed pattern handle new columns added by a migration?
+**A:** Populate `update: { city, province }` as well as `create`. With `update: {}`, re-running the seed against an existing database leaves new columns as NULL for rows that already exist, making the test data unreliable. The `update` block should include any backfillable fields.
+
+**Q:** What's the right way to sync multiple URL search params with multiple React state variables?
+**A:** In a single `useEffect` keyed on `searchParams`, read all params at once and call all `setState` calls and the fetch together. This avoids multiple renders and keeps state in sync with the URL in one pass.
+
+---
+
+### Anti-Patterns
+
+**Q:** Why shouldn't you split a multi-field Prisma filter into separate `providerProfile` spread keys?
+**A:** TypeScript will complain about duplicate object keys, and even in plain JS, only the last key wins — earlier conditions are silently ignored. Always merge into one `providerProfile: { ...spread1, ...spread2 }` object.
+
+---
+
+### Challenges
+
+**Q:** The existing clear-search button called `router.push('/providers')` inline — should the new city/province clear buttons do the same?
+**A:** No. Each clear button sets only its own input to `''` via `setState`, letting the user clear one field at a time and re-submit. A single "Clear all" link still calls `router.push('/providers')` to reset everything at once.
+
+---
+
+### Decisions
+
+**Q:** Two separate query params (`city`, `province`) vs. one combined `location` param — which is better?
+**A:** Separate. A single `location` string mixes two semantically distinct fields, making partial filtering (e.g., "all providers in ON regardless of city") impossible. Separate params match the existing `specialty` pattern and are more composable.
+
+**Q:** Should `ProviderProfile` use `city`/`province` free-text or a select/enum for province?
+**A:** Free text, matching the `specialty` pattern. An enum or dropdown adds friction for a demo app and is premature — the backend uses case-insensitive `contains`, so "on", "ON", and "Ontario" all work. A stricter type could be added later if needed.
+
+---
+
 ## 2026-04-30 — Unauthenticated Provider Search & Config Hardening
 
 ### Patterns

@@ -23,12 +23,14 @@ const Logo = () => (
 
 const LandingPage: React.FC = () => {
   const router = useRouter();
-  const [search, setSearch] = useState({ specialty: '' });
+  const [search, setSearch] = useState({ specialty: '', city: '', province: '' });
   const [menuOpen, setMenuOpen] = useState(false);
 
   const handleFindCare = () => {
     const params = new URLSearchParams();
     if (search.specialty) params.set('specialty', search.specialty);
+    if (search.city) params.set('city', search.city);
+    if (search.province) params.set('province', search.province);
     router.push(`/providers${params.size ? `?${params}` : ''}`);
   };
 
@@ -120,6 +122,24 @@ const LandingPage: React.FC = () => {
                 placeholder="e.g. Primary Care"
                 className="w-full outline-none text-slate-800 placeholder:text-slate-300 font-semibold"
                 onChange={(e) => setSearch({ ...search, specialty: e.target.value })}
+              />
+            </div>
+            <div className="flex-1 px-6 py-4 flex flex-col items-start border-r border-slate-50">
+              <label className="text-[10px] font-black uppercase tracking-widest text-teal-600 mb-1">City</label>
+              <input
+                type="text"
+                placeholder="e.g. Toronto"
+                className="w-full outline-none text-slate-800 placeholder:text-slate-300 font-semibold"
+                onChange={(e) => setSearch({ ...search, city: e.target.value })}
+              />
+            </div>
+            <div className="flex-1 px-6 py-4 flex flex-col items-start border-r border-slate-50">
+              <label className="text-[10px] font-black uppercase tracking-widest text-teal-600 mb-1">Province</label>
+              <input
+                type="text"
+                placeholder="e.g. ON"
+                className="w-full outline-none text-slate-800 placeholder:text-slate-300 font-semibold"
+                onChange={(e) => setSearch({ ...search, province: e.target.value })}
               />
             </div>
             <button

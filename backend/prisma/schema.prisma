@@ -39,6 +39,8 @@ model ProviderProfile {
   user                User               @relation(fields: [userId], references: [id], onDelete: Cascade)
   specialty           String?
   bio                 String?
+  city                String?
+  province            String?
   licenseNumber       String?
   appointmentDuration Int                @default(30)
   availabilitySlots   AvailabilitySlot[]

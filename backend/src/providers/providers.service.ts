@@ -5,14 +5,16 @@ import { PrismaService } from '../prisma/prisma.service';
 export class ProvidersService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll(specialty?: string) {
+  async findAll(specialty?: string, city?: string, province?: string) {
     return this.prisma.user.findMany({
       where: {
         role: { name: 'provider' },
-        ...(specialty
+        ...(specialty || city || province
           ? {
               providerProfile: {
-                specialty: { contains: specialty, mode: 'insensitive' },
+                ...(specialty ? { specialty: { contains: specialty, mode: 'insensitive' } } : {}),
+                ...(city ? { city: { contains: city, mode: 'insensitive' } } : {}),
+                ...(province ? { province: { contains: province, mode: 'insensitive' } } : {}),
               },
             }
           : {}),
@@ -24,6 +26,8 @@ export class ProvidersService {
           select: {
             specialty: true,
             bio: true,
+            city: true,
+            province: true,
             appointmentDuration: true,
           },
         },
@@ -44,6 +48,8 @@ export class ProvidersService {
           select: {
             specialty: true,
             bio: true,
+            city: true,
+            province: true,
             appointmentDuration: true,
             availabilitySlots: {
               where: { isActive: true },

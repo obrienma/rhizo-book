@@ -14,6 +14,8 @@ interface Provider {
   providerProfile: {
     specialty: string;
     bio: string;
+    city: string | null;
+    province: string | null;
     appointmentDuration: number;
   } | null;
 }
@@ -25,12 +27,18 @@ function ProvidersContent() {
   const [providers, setProviders] = useState<Provider[]>([]);
   const [loading, setLoading] = useState(true);
   const [specialtyInput, setSpecialtyInput] = useState(searchParams.get('specialty') ?? '');
+  const [cityInput, setCityInput] = useState(searchParams.get('city') ?? '');
+  const [provinceInput, setProvinceInput] = useState(searchParams.get('province') ?? '');
 
-  const fetchProviders = useCallback(async (specialty: string) => {
+  const fetchProviders = useCallback(async (specialty: string, city: string, province: string) => {
     setLoading(true);
     try {
-      const params = specialty ? `?specialty=${encodeURIComponent(specialty)}` : '';
-      const res = await axios.get(`/v1/providers${params}`);
+      const params = new URLSearchParams();
+      if (specialty) params.set('specialty', specialty);
+      if (city) params.set('city', city);
+      if (province) params.set('province', province);
+      const qs = params.size ? `?${params}` : '';
+      const res = await axios.get(`/v1/providers${qs}`);
       setProviders(res.data);
     } catch (error) {
       console.error('Error fetching providers:', error);
@@ -41,18 +49,26 @@ function ProvidersContent() {
 
   useEffect(() => {
     const specialty = searchParams.get('specialty') ?? '';
+    const city = searchParams.get('city') ?? '';
+    const province = searchParams.get('province') ?? '';
     setSpecialtyInput(specialty);
-    fetchProviders(specialty);
+    setCityInput(city);
+    setProvinceInput(province);
+    fetchProviders(specialty, city, province);
   }, [searchParams, fetchProviders]);
 
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const params = new URLSearchParams();
     if (specialtyInput.trim()) params.set('specialty', specialtyInput.trim());
+    if (cityInput.trim()) params.set('city', cityInput.trim());
+    if (provinceInput.trim()) params.set('province', provinceInput.trim());
     router.push(`/providers${params.size ? `?${params}` : ''}`);
   };
 
   const activeSpecialty = searchParams.get('specialty');
+  const activeCity = searchParams.get('city');
+  const activeProvince = searchParams.get('province');
 
   return (
     <div className="max-w-6xl mx-auto">
@@ -62,53 +78,90 @@ function ProvidersContent() {
       </div>
 
       {/* Search bar */}
-      <form onSubmit={handleSearch} className="mb-10 flex gap-3">
-        <div className="flex-1 bg-white rounded-2xl border border-green-100 shadow-sm flex items-center px-5 gap-3">
-          <svg className="w-4 h-4 text-teal-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
-          </svg>
-          <Input
-            type="text"
-            placeholder="Search by specialty (e.g. Cardiology)"
-            value={specialtyInput}
-            onChange={(e) => setSpecialtyInput(e.target.value)}
-            className="border-0 shadow-none focus-visible:ring-0 font-semibold text-slate-700 placeholder:text-slate-300 h-14 px-0"
-          />
-          {specialtyInput && (
-            <button
-              type="button"
-              onClick={() => {
-                setSpecialtyInput('');
-                router.push('/providers');
-              }}
-              className="text-slate-300 hover:text-slate-500 transition shrink-0"
-              aria-label="Clear search"
-            >
-              ✕
-            </button>
-          )}
+      <form onSubmit={handleSearch} className="mb-10 flex flex-col gap-3">
+        <div className="flex gap-3">
+          <div className="flex-1 bg-white rounded-2xl border border-green-100 shadow-sm flex items-center px-5 gap-3">
+            <svg className="w-4 h-4 text-teal-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
+            </svg>
+            <Input
+              type="text"
+              placeholder="Search by specialty (e.g. Cardiology)"
+              value={specialtyInput}
+              onChange={(e) => setSpecialtyInput(e.target.value)}
+              className="border-0 shadow-none focus-visible:ring-0 font-semibold text-slate-700 placeholder:text-slate-300 h-14 px-0"
+            />
+            {specialtyInput && (
+              <button
+                type="button"
+                onClick={() => setSpecialtyInput('')}
+                className="text-slate-300 hover:text-slate-500 transition shrink-0"
+                aria-label="Clear specialty"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+          <Button
+            type="submit"
+            className="px-8 h-14 rounded-2xl bg-[#2DD4BF] hover:bg-teal-500 text-[#164E63] font-black shadow-lg active:scale-95 transition-all"
+          >
+            Search
+          </Button>
         </div>
-        <Button
-          type="submit"
-          className="px-8 h-14 rounded-2xl bg-[#2DD4BF] hover:bg-teal-500 text-[#164E63] font-black shadow-lg active:scale-95 transition-all"
-        >
-          Search
-        </Button>
+        <div className="flex gap-3">
+          <div className="flex-1 bg-white rounded-2xl border border-green-100 shadow-sm flex items-center px-5 gap-3">
+            <Input
+              type="text"
+              placeholder="City (e.g. Toronto)"
+              value={cityInput}
+              onChange={(e) => setCityInput(e.target.value)}
+              className="border-0 shadow-none focus-visible:ring-0 font-semibold text-slate-700 placeholder:text-slate-300 h-14 px-0"
+            />
+            {cityInput && (
+              <button type="button" onClick={() => setCityInput('')} className="text-slate-300 hover:text-slate-500 transition shrink-0" aria-label="Clear city">✕</button>
+            )}
+          </div>
+          <div className="flex-1 bg-white rounded-2xl border border-green-100 shadow-sm flex items-center px-5 gap-3">
+            <Input
+              type="text"
+              placeholder="Province (e.g. ON)"
+              value={provinceInput}
+              onChange={(e) => setProvinceInput(e.target.value)}
+              className="border-0 shadow-none focus-visible:ring-0 font-semibold text-slate-700 placeholder:text-slate-300 h-14 px-0"
+            />
+            {provinceInput && (
+              <button type="button" onClick={() => setProvinceInput('')} className="text-slate-300 hover:text-slate-500 transition shrink-0" aria-label="Clear province">✕</button>
+            )}
+          </div>
+        </div>
       </form>
 
-      {activeSpecialty && (
-        <div className="mb-6 flex items-center gap-3">
+      {(activeSpecialty || activeCity || activeProvince) && (
+        <div className="mb-6 flex items-center gap-3 flex-wrap">
           <span className="text-sm font-semibold text-slate-500">
             Showing results for:
           </span>
-          <span className="px-4 py-1.5 bg-teal-50 border border-teal-100 rounded-full text-sm font-black text-teal-700">
-            {activeSpecialty}
-          </span>
+          {activeSpecialty && (
+            <span className="px-4 py-1.5 bg-teal-50 border border-teal-100 rounded-full text-sm font-black text-teal-700">
+              {activeSpecialty}
+            </span>
+          )}
+          {activeCity && (
+            <span className="px-4 py-1.5 bg-teal-50 border border-teal-100 rounded-full text-sm font-black text-teal-700">
+              {activeCity}
+            </span>
+          )}
+          {activeProvince && (
+            <span className="px-4 py-1.5 bg-teal-50 border border-teal-100 rounded-full text-sm font-black text-teal-700">
+              {activeProvince}
+            </span>
+          )}
           <button
             onClick={() => router.push('/providers')}
             className="text-xs font-bold text-slate-400 hover:text-slate-600 transition"
           >
-            Clear
+            Clear all
           </button>
         </div>
       )}
@@ -122,9 +175,9 @@ function ProvidersContent() {
         <div className="flex flex-col items-center justify-center py-20 text-slate-400">
           <div className="text-5xl mb-4">🔍</div>
           <p className="font-bold text-lg text-slate-600">No providers found</p>
-          {activeSpecialty && (
+          {(activeSpecialty || activeCity || activeProvince) && (
             <p className="text-sm mt-2 font-medium">
-              No results for &ldquo;{activeSpecialty}&rdquo;.{' '}
+              No providers match your filters.{' '}
               <button onClick={() => router.push('/providers')} className="text-teal-600 font-bold hover:underline">
                 View all providers
               </button>
@@ -145,6 +198,11 @@ function ProvidersContent() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-8 pt-0 flex-1 flex flex-col">
+                {(provider.providerProfile?.city || provider.providerProfile?.province) && (
+                  <p className="text-xs font-semibold text-slate-400 mb-3">
+                    {[provider.providerProfile.city, provider.providerProfile.province].filter(Boolean).join(', ')}
+                  </p>
+                )}
                 {provider.providerProfile?.bio && (
                   <p className="mb-8 text-sm text-slate-500 font-medium flex-1">
                     {provider.providerProfile.bio.substring(0, 120)}...

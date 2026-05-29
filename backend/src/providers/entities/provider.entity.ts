@@ -33,6 +33,12 @@ export class ProviderProfileDetailEntity {
   @ApiPropertyOptional({ example: 'Board-certified cardiologist with 15 years of experience.' })
   bio: string | null;
 
+  @ApiPropertyOptional({ example: 'Toronto' })
+  city: string | null;
+
+  @ApiPropertyOptional({ example: 'ON' })
+  province: string | null;
+
   @ApiPropertyOptional({ example: 'MD-2048-CA' })
   licenseNumber: string | null;
 

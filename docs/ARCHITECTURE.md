@@ -54,7 +54,7 @@ src/
 │   ├── entities/          provider.entity.ts, availability-slot.entity.ts
 │   ├── dto/
 │   ├── providers.controller.ts
-│   └── providers.service.ts  findAll(), findOne() — includes availability slots
+│   └── providers.service.ts  findAll(specialty?, city?, province?), findOne() — includes availability slots
 ├── appointments/
 │   ├── entities/          appointment.entity.ts
 │   ├── dto/               create-appointment.dto.ts, cancel-appointment.dto.ts
@@ -145,7 +145,7 @@ Role (1) ──────────── (N) User
 ### Key relationships
 
 - `User.roleId` → `Role.id` (provider | patient)
-- `ProviderProfile.userId` → `User.id` (1-to-1)
+- `ProviderProfile.userId` → `User.id` (1-to-1); profile fields: `specialty`, `bio`, `city`, `province`, `appointmentDuration`
 - `PatientProfile.userId` → `User.id` (1-to-1)
 - `AvailabilitySlot.providerId` → `ProviderProfile.id` (**not** User.id)
 - `Appointment.providerId` → `User.id`

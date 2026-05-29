@@ -41,7 +41,8 @@ A full-stack healthcare appointment scheduling system built with NestJS, Next.js
 - [x] Unified branding experience for authenticated and unauthenticated users (RhizoBook)
 - [x] Expanded seed data with French Canadian and multi-character sets
 - [x] Unauthenticated provider search
-- [ ] Location-based provider search (requires location field on ProviderProfile)
+- [x] Location-based provider search (city + province filter on ProviderProfile)
+- [ ] Google Calendar invites + email notifications on booking
 - [ ] Email notifications and reminders
 - [ ] Calendar view for appointments
 - [ ] Recurring availability schedules
