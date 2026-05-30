@@ -44,7 +44,7 @@ A full-stack healthcare appointment scheduling system built with NestJS, Next.js
 - [x] Location-based provider search (city + province filter on ProviderProfile)
 - [ ] Google Calendar invites + email notifications on booking
 - [ ] Email notifications and reminders
-- [ ] Calendar view for appointments
+- [x] Calendar view for appointments (month + week, color-coded by status, toggle on /appointments)
 - [ ] Recurring availability schedules
 - [ ] Timezone handling
 - [ ] HIPAA compliance features

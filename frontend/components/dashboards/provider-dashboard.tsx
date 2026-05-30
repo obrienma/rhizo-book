@@ -16,17 +16,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-
-interface Appointment {
-  id: number;
-  startTime: string;
-  endTime: string;
-  status: string;
-  patient: {
-    name: string;
-    email: string;
-  };
-}
+import { Appointment } from '@/lib/types';
 
 export default function ProviderDashboard() {
   const { data: session } = useSession();

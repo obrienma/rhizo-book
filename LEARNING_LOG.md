@@ -4,6 +4,45 @@ Patterns, anti-patterns, challenges, and decisions encountered during developmen
 
 ---
 
+## 2026-05-29 — In-App Calendar View
+
+### Patterns
+
+**Q:** How do you wire up `react-big-calendar` with a `date-fns` localizer in a Next.js app?
+**A:** Import `dateFnsLocalizer` from `'react-big-calendar/lib/localizers/date-fns'` (not the top-level package), pass it `format`, `parse`, `startOfWeek`, `getDay`, and a locales map. Import the CSS from `'react-big-calendar/lib/css/react-big-calendar.css'` inside the `'use client'` component — Next.js handles it as a CSS module at runtime.
+
+**Q:** How do you color calendar events by a data property?
+**A:** Use `eventPropGetter` — a callback that receives each event object and returns `{ style: { backgroundColor, color, ... } }`. Map your status enum to a color palette at the component top level so the getter is a pure lookup.
+
+**Q:** Where should a shared TypeScript interface live when it's used across 3+ files?
+**A:** `lib/types.ts` — a plain export file with no framework dependencies. Import from it everywhere. Avoids the problem of drift between locally-redeclared interfaces that should be identical.
+
+---
+
+### Anti-Patterns
+
+**Q:** Why shouldn't you import `react-big-calendar` CSS globally in `layout.tsx`?
+**A:** It pollutes the global stylesheet with `.rbc-*` rules on every page. Importing it inside the component file that actually uses the library keeps the dependency co-located and avoids confusion about where the styles come from.
+
+---
+
+### Challenges
+
+**Q:** The `SlotInfo` type from `react-big-calendar` wasn't exported from the top-level package — how was it resolved?
+**A:** Import it directly: `import { ..., SlotInfo } from 'react-big-calendar'`. It is exported from the top-level index in v1.x — the apparent confusion was a red herring from an old docs example. Typecheck confirmed it worked cleanly.
+
+---
+
+### Decisions
+
+**Q:** Calendar as a new `/calendar` route vs. a toggle on `/appointments` — which is better?
+**A:** Toggle on `/appointments`. Same data, two presentations. Avoids duplicating fetch logic and nav entries. The toggle pattern (List / Calendar) is a well-understood UX convention (used by Gmail, Linear, etc.) and communicates that these are views of the same data, not separate features.
+
+**Q:** `react-big-calendar` vs. building a custom calendar grid?
+**A:** `react-big-calendar` — it's what a real engineer would reach for, it's highly configurable, and the skill is in integration and customization (color coding, event rendering, CSS overrides to match brand), not in grid math. A poorly built custom grid would look worse than a well-integrated library.
+
+---
+
 ## 2026-05-29 — Location-Based Provider Search
 
 ### Patterns
