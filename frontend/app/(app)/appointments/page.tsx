@@ -16,17 +16,8 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-
-interface Appointment {
-  id: number;
-  startTime: string;
-  endTime: string;
-  status: 'SCHEDULED' | 'COMPLETED' | 'CANCELLED' | 'NO_SHOW';
-  notes: string | null;
-  cancellationReason: string | null;
-  provider: { id: number; name: string; email: string };
-  patient: { id: number; name: string; email: string };
-}
+import CalendarView from '@/components/appointments/CalendarView';
+import { Appointment } from '@/lib/types';
 
 const STATUS_STYLES: Record<string, string> = {
   SCHEDULED: 'bg-green-100 text-green-800',
@@ -42,6 +33,7 @@ export default function AppointmentsPage() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>('SCHEDULED');
+  const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
 
   // Cancel dialog state
   const [cancelId, setCancelId] = useState<number | null>(null);
@@ -91,33 +83,69 @@ export default function AppointmentsPage() {
           <h1 className="text-4xl font-black text-slate-900 tracking-tight">Appointments</h1>
           <p className="text-slate-500 font-medium mt-1">Manage and track your healthcare schedule.</p>
         </div>
-        {!isProvider && (
-          <Link href="/providers">
-            <Button className="px-8 py-6 rounded-2xl bg-[#164E63] text-white font-bold hover:bg-slate-800 transition-all shadow-lg shadow-teal-900/10 active:scale-95">
-              Book New Appointment
-            </Button>
-          </Link>
-        )}
+        <div className="flex items-center gap-3">
+          {/* View toggle */}
+          <div className="flex gap-1 bg-slate-100 rounded-xl p-1">
+            <button
+              onClick={() => setViewMode('list')}
+              className={`px-4 py-1.5 text-sm font-bold rounded-lg transition-all ${
+                viewMode === 'list'
+                  ? 'bg-white text-slate-800 shadow-sm'
+                  : 'text-slate-500 hover:text-slate-700'
+              }`}
+            >
+              List
+            </button>
+            <button
+              onClick={() => setViewMode('calendar')}
+              className={`px-4 py-1.5 text-sm font-bold rounded-lg transition-all ${
+                viewMode === 'calendar'
+                  ? 'bg-white text-slate-800 shadow-sm'
+                  : 'text-slate-500 hover:text-slate-700'
+              }`}
+            >
+              Calendar
+            </button>
+          </div>
+          {!isProvider && (
+            <Link href="/providers">
+              <Button className="px-8 py-6 rounded-2xl bg-[#164E63] text-white font-bold hover:bg-slate-800 transition-all shadow-lg shadow-teal-900/10 active:scale-95">
+                Book New Appointment
+              </Button>
+            </Link>
+          )}
+        </div>
       </div>
 
-      {/* Filter tabs */}
-      <div className="mb-8 flex flex-wrap gap-2">
-        {['ALL', 'SCHEDULED', 'COMPLETED', 'CANCELLED', 'NO_SHOW'].map((s) => (
-          <button
-            key={s}
-            onClick={() => setFilter(s)}
-            className={`px-5 py-2 rounded-full text-xs font-black uppercase tracking-widest transition-all ${
-              filter === s
-                ? 'bg-teal-600 text-white shadow-md shadow-teal-600/20'
-                : 'bg-white text-slate-500 hover:bg-teal-50 border border-green-50'
-            }`}
-          >
-            {s === 'ALL' ? 'All' : s.replace('_', ' ')}
-          </button>
-        ))}
-      </div>
+      {/* Filter tabs — list mode only */}
+      {viewMode === 'list' && (
+        <div className="mb-8 flex flex-wrap gap-2">
+          {['ALL', 'SCHEDULED', 'COMPLETED', 'CANCELLED', 'NO_SHOW'].map((s) => (
+            <button
+              key={s}
+              onClick={() => setFilter(s)}
+              className={`px-5 py-2 rounded-full text-xs font-black uppercase tracking-widest transition-all ${
+                filter === s
+                  ? 'bg-teal-600 text-white shadow-md shadow-teal-600/20'
+                  : 'bg-white text-slate-500 hover:bg-teal-50 border border-green-50'
+              }`}
+            >
+              {s === 'ALL' ? 'All' : s.replace('_', ' ')}
+            </button>
+          ))}
+        </div>
+      )}
 
-      {loading ? (
+      {viewMode === 'calendar' ? (
+        loading ? (
+          <div className="flex flex-col items-center justify-center py-20 text-slate-400">
+            <div className="w-10 h-10 border-4 border-teal-600 border-t-transparent rounded-full animate-spin mb-4"></div>
+            <p className="font-bold">Syncing your schedule...</p>
+          </div>
+        ) : (
+          <CalendarView appointments={appointments} role={session?.user?.roleName ?? 'patient'} />
+        )
+      ) : loading ? (
         <div className="flex flex-col items-center justify-center py-20 text-slate-400">
           <div className="w-10 h-10 border-4 border-teal-600 border-t-transparent rounded-full animate-spin mb-4"></div>
           <p className="font-bold">Syncing your schedule...</p>
