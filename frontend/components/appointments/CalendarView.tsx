@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { Calendar, dateFnsLocalizer, View, SlotInfo } from 'react-big-calendar';
 import { format, parse, startOfWeek, getDay } from 'date-fns';
 import { enCA } from 'date-fns/locale';
-import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { Appointment } from '@/lib/types';
 
 const localizer = dateFnsLocalizer({
