@@ -4,6 +4,45 @@ Patterns, anti-patterns, challenges, and decisions encountered during developmen
 
 ---
 
+## 2026-06-01 — Vercel Production Build Hardening
+
+### Patterns
+
+**Q:** Which Next.js / build-time packages must be in `dependencies` rather than `devDependencies` for a Vercel deployment?
+**A:** Any package that is imported or resolved during `next build`: `tailwindcss`, `@tailwindcss/postcss`, `tw-animate-css`, `typescript`, all `@types/*` packages, `eslint`, and `eslint-config-next`. Vercel sets `NODE_ENV=production` and skips `devDependencies`, so anything the build toolchain touches at compile time must be in `dependencies`. Test-only packages (`vitest`, `@testing-library/*`, `jsdom`, `@vitejs/plugin-react`) are safe to leave in `devDependencies` because they are never imported during the build.
+
+**Q:** How do you stop `vitest.config.ts` from breaking the Next.js TypeScript check while keeping local type safety for tests?
+**A:** Add `vitest.config.ts` to the `exclude` array in `tsconfig.json` and remove `"types": ["vitest/globals"]` from `compilerOptions`. Create a separate `tsconfig.test.json` that extends the main one and re-adds the vitest globals type, covering `vitest.config.ts` and `__tests__/`. Vitest picks this up automatically because it searches for the nearest tsconfig.
+
+**Q:** What is the required pattern for using `useSearchParams()` in a Next.js App Router page?
+**A:** The hook must be called inside a component wrapped in `<Suspense>`. The exported page component should be a thin wrapper that renders `<Suspense><InnerComponent /></Suspense>`; all hook usage lives in the inner component. Without this, static generation (`next build`) throws and the build fails.
+
+---
+
+### Anti-Patterns
+
+**Q:** Why can't you rely on `devDependencies` for build-time tooling on Vercel?
+**A:** Vercel's production build environment runs `npm install --omit=dev` (equivalent), so devDependencies are never installed. Packages that work fine locally — where all deps are always present — will cause module-not-found errors at build time on Vercel.
+
+---
+
+### Challenges
+
+**Q:** The `@tailwindcss/postcss` error was the first to surface, but it wasn't the only misplaced package. How were the others found?
+**A:** Each Vercel build revealed the next missing package in sequence: first `@tailwindcss/postcss`, then `typescript`/`@types/*` (TypeScript check stage), then `eslint`/`eslint-config-next` (lint stage), then `vitest` (picked up via `vitest.config.ts` during TS compilation). The fix was to move all build-time packages in one pass rather than waiting for each redeploy.
+
+**Q:** Removing `"types": ["vitest/globals"]` from `tsconfig.json` broke test file type checking — `describe`, `it`, `expect` lost their types. How was it resolved?
+**A:** A separate `tsconfig.test.json` extending the main config was created with `"types": ["vitest/globals"]` scoped only to test files. This keeps the main tsconfig clean for the Next.js build while restoring types in `__tests__/`.
+
+---
+
+### Decisions
+
+**Q:** Should `vitest` be moved to `dependencies` to fix the `vitest/config` type error, or should the tsconfig be fixed instead?
+**A:** Fix the tsconfig. Moving a test runner to `dependencies` ships unnecessary code to production and is the wrong layer to solve a build-configuration problem. The correct fix is to exclude `vitest.config.ts` from the Next.js compilation scope.
+
+---
+
 ## 2026-05-29 — In-App Calendar View
 
 ### Patterns
