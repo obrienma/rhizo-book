@@ -1,6 +1,6 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  transpilePackages: ['react-big-calendar'],
   async rewrites() {
     const backendUrl = process.env.BACKEND_URL ?? 'http://localhost:3001';
     return [
@@ -12,4 +12,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+module.exports = nextConfig;
