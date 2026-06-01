@@ -21,6 +21,7 @@ export async function submitRegistration(
   values: RegistrationValues,
   roleId: number,
   router: Router,
+  callbackUrl = '/dashboard',
 ): Promise<void> {
   try {
     await api.post('/auth/register', {
@@ -40,7 +41,7 @@ export async function submitRegistration(
       toast.error('Account created — please sign in.');
       router.push('/login');
     } else {
-      router.push('/dashboard');
+      router.push(callbackUrl);
       router.refresh();
     }
   } catch (err: unknown) {

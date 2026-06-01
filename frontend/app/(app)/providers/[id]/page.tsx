@@ -281,7 +281,7 @@ export default function ProviderDetailPage() {
                       Sign In to Book
                     </Button>
                   </Link>
-                  <Link href="/register" className="w-full">
+                  <Link href={`/register?callbackUrl=/providers/${provider.id}`} className="w-full">
                     <Button
                       variant="outline"
                       className="w-full h-14 rounded-2xl border-2 border-white/20 text-white bg-transparent font-bold hover:bg-white/10 transition-all active:scale-95"

@@ -1,6 +1,7 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -17,8 +18,9 @@ const registerSchema = baseRegisterSchema;
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
-export default function PatientRegisterPage() {
+function PatientRegisterForm() {
   const router = useRouter();
+  const callbackUrl = useSearchParams().get('callbackUrl') ?? '/dashboard';
 
   const {
     register,
@@ -28,7 +30,7 @@ export default function PatientRegisterPage() {
     resolver: zodResolver(registerSchema),
   });
 
-  const onSubmit = (values: RegisterFormValues) => submitRegistration(values, 2, router);
+  const onSubmit = (values: RegisterFormValues) => submitRegistration(values, 2, router, callbackUrl);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#F0FDF4] px-4 py-12 font-sans selection:bg-teal-100">
@@ -138,7 +140,7 @@ export default function PatientRegisterPage() {
 
             <p className="mt-6 text-center text-sm text-slate-500">
               Already have an account?{' '}
-              <Link href="/login" className="text-teal-600 font-bold hover:underline">
+              <Link href={callbackUrl !== '/dashboard' ? `/login?callbackUrl=${callbackUrl}` : '/login'} className="text-teal-600 font-bold hover:underline">
                 Sign in
               </Link>
             </p>
@@ -156,5 +158,13 @@ export default function PatientRegisterPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function PatientRegisterPage() {
+  return (
+    <Suspense>
+      <PatientRegisterForm />
+    </Suspense>
   );
 }

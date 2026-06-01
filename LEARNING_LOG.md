@@ -4,6 +4,39 @@ Patterns, anti-patterns, challenges, and decisions encountered during developmen
 
 ---
 
+## 2026-06-01 — Post-Registration Provider Context Preservation
+
+### Patterns
+
+**Q:** How do you preserve a user's destination through a multi-step auth flow (browse → register → return)?
+**A:** Thread a `callbackUrl` query param through every step. The provider detail page sets it on both the login and register links (`?callbackUrl=/providers/:id`). The register page reads it with `useSearchParams` and passes it to the shared `submitRegistration` helper, which uses it in the final redirect instead of a hardcoded `/dashboard`. The "Already have an account?" link also forwards the callbackUrl to `/login` so neither path loses context.
+
+**Q:** What is the correct signature for a shared auth helper that needs to support optional redirect destinations?
+**A:** Add `callbackUrl = '/dashboard'` as a defaulted parameter at the end of the function signature. This keeps all existing call sites working unchanged (they get the default) while allowing callers that have a destination to pass it explicitly. Never hardcode the redirect inside a shared helper.
+
+---
+
+### Anti-Patterns
+
+**Q:** Why is hardcoding `router.push('/dashboard')` inside a shared registration helper a problem?
+**A:** It makes the helper impossible to reuse for flows where context matters — any caller that wants a different destination has no way to express it. The correct approach is to accept the destination as a parameter with a sensible default, so the helper is reusable and callers stay in control of where the user lands.
+
+---
+
+### Challenges
+
+**Q:** The login button on the provider detail page already passed `callbackUrl` correctly. Why didn't the register button?
+**A:** The two buttons were added at different times — the login path was built first and the pattern was established there. The register button was added later without carrying the pattern over. The inconsistency was only caught when the use case (browse → register → return) was explicitly described. This is a good argument for writing the full user journey as a test or spec before implementing CTAs.
+
+---
+
+### Decisions
+
+**Q:** Should the "Already have an account? Sign in" link on the register page also forward `callbackUrl`?
+**A:** Yes. If a user arrives at `/register?callbackUrl=/providers/3` and then decides to sign in instead, the callbackUrl should not be dropped — they still want to end up at the provider page. The link conditionally appends the callbackUrl only when it differs from the default (`/dashboard`) to avoid cluttering the URL in the normal case.
+
+---
+
 ## 2026-06-01 — Vercel Production Build Hardening
 
 ### Patterns
