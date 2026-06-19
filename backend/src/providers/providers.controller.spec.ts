@@ -4,12 +4,13 @@ import { ProvidersService } from './providers.service';
 
 describe('ProvidersController', () => {
   let controller: ProvidersController;
-  let service: { findAll: jest.Mock; findOne: jest.Mock };
+  let service: { findAll: jest.Mock; findOne: jest.Mock; findSearchOptions: jest.Mock };
 
   beforeEach(async () => {
     service = {
       findAll: jest.fn(),
       findOne: jest.fn(),
+      findSearchOptions: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -49,6 +50,18 @@ describe('ProvidersController', () => {
       await controller.findAll(undefined, 'toronto', 'ON');
 
       expect(service.findAll).toHaveBeenCalledWith(undefined, 'toronto', 'ON');
+    });
+  });
+
+  describe('getSearchOptions', () => {
+    it('should return search options from service', async () => {
+      const options = { specialties: ['Cardiology'], cities: ['Toronto'], provinces: ['ON'] };
+      service.findSearchOptions.mockResolvedValue(options);
+
+      const result = await controller.getSearchOptions();
+
+      expect(service.findSearchOptions).toHaveBeenCalled();
+      expect(result).toEqual(options);
     });
   });
 

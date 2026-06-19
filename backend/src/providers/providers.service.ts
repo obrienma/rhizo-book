@@ -35,6 +35,34 @@ export class ProvidersService {
     });
   }
 
+  async findSearchOptions() {
+    const [specialties, cities, provinces] = await Promise.all([
+      this.prisma.providerProfile.findMany({
+        select: { specialty: true },
+        distinct: ['specialty'],
+        where: { specialty: { not: null } },
+        orderBy: { specialty: 'asc' },
+      }),
+      this.prisma.providerProfile.findMany({
+        select: { city: true },
+        distinct: ['city'],
+        where: { city: { not: null } },
+        orderBy: { city: 'asc' },
+      }),
+      this.prisma.providerProfile.findMany({
+        select: { province: true },
+        distinct: ['province'],
+        where: { province: { not: null } },
+        orderBy: { province: 'asc' },
+      }),
+    ]);
+    return {
+      specialties: specialties.map((r) => r.specialty as string),
+      cities: cities.map((r) => r.city as string),
+      provinces: provinces.map((r) => r.province as string),
+    };
+  }
+
   async findOne(id: number) {
     const provider = await this.prisma.user.findFirst({
       where: {

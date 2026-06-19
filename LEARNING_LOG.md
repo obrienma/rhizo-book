@@ -154,6 +154,42 @@ Patterns, anti-patterns, challenges, and decisions encountered during developmen
 
 ---
 
+## 2026-06-18 — Test Coverage for Provider Search Expansion
+
+### Patterns
+
+**Q:** When a component makes multiple `axios.get` calls on mount (e.g., one for options, one for data), how should tests mock them?
+**A:** Use `mockImplementation` with URL-based routing rather than `mockResolvedValue` or ordered `mockResolvedValueOnce`. URL routing is explicit, order-independent, and survives refactors that change call sequence. Pattern: `vi.mocked(axios.get).mockImplementation((url) => url === '/v1/endpoint' ? Promise.resolve({ data: X }) : Promise.resolve({ data: Y }))`.
+
+**Q:** When a service method calls the same Prisma method three times in parallel via `Promise.all`, how do you mock each call independently?
+**A:** Chain `mockResolvedValueOnce` — the mock queue is consumed FIFO in the order calls are dispatched. Since `Promise.all([a, b, c])` dispatches all three calls synchronously before any `await`, the dispatch order matches the source order. Chain: `.mockResolvedValueOnce(specialties).mockResolvedValueOnce(cities).mockResolvedValueOnce(provinces)`.
+
+**Q:** How do you write a test that asserts filter chip rendering based on URL search params?
+**A:** Mock `useSearchParams` as a `vi.fn()` and call `vi.mocked(useSearchParams).mockReturnValue(new URLSearchParams('specialty=Cardiology') as any)` per test. This makes the hook return whatever params the test needs without touching the router.
+
+---
+
+### Anti-Patterns
+
+**Q:** Why does `mockResolvedValue(providers)` break once a component gains a second `axios.get` call?
+**A:** `mockResolvedValue` sets a default for all calls. If the options call expects `{ specialties, cities, provinces }` but gets a providers array, `setSearchOptions` is called with an array — then `searchOptions.specialties.filter(...)` throws (or renders nothing). Always use URL-based routing when a component makes multiple distinct API calls.
+
+---
+
+### Challenges
+
+**Q:** The existing frontend providers test used `mockResolvedValue(providers)` and presumably passed before. Why didn't it break earlier?
+**A:** The options endpoint (`/v1/providers/options`) and the second `axios.get` call were added as part of the same uncommitted changeset — the tests predated the feature. The old tests would have started failing as soon as the component was updated, but no test run had caught it yet. This is the scenario "tests for uncommitted files" is designed to surface.
+
+---
+
+### Decisions
+
+**Q:** For the `findSearchOptions` service tests, should you assert all three `providerProfile.findMany` calls in one test or one test per field?
+**A:** One test per field. Each assertion is about a distinct Prisma query shape (specialty vs. city vs. province), so splitting them gives cleaner failure messages and makes it obvious which query regressed. The cost is three near-identical `beforeEach`-style setups, but that's acceptable for the diagnostic clarity.
+
+---
+
 ## 2026-04-30 — Unauthenticated Provider Search & Config Hardening
 
 ### Patterns

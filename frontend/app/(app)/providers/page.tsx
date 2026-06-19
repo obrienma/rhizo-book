@@ -20,15 +20,97 @@ interface Provider {
   } | null;
 }
 
+interface SearchOptions {
+  specialties: string[];
+  cities: string[];
+  provinces: string[];
+}
+
+function SuggestionInput({
+  value,
+  onChange,
+  onClear,
+  options,
+  placeholder,
+  prefix,
+}: {
+  value: string;
+  onChange: (val: string) => void;
+  onClear: () => void;
+  options: string[];
+  placeholder: string;
+  prefix?: React.ReactNode;
+}) {
+  const [open, setOpen] = useState(false);
+
+  const filtered = options.filter((opt) =>
+    opt.toLowerCase().includes(value.toLowerCase())
+  );
+
+  return (
+    <div className="relative flex-1">
+      <div className="bg-white rounded-2xl border border-green-100 shadow-sm flex items-center px-5 gap-3">
+        {prefix}
+        <Input
+          type="text"
+          placeholder={placeholder}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          onFocus={() => setOpen(true)}
+          onBlur={() => setOpen(false)}
+          onKeyDown={(e) => { if (e.key === 'Escape') setOpen(false); }}
+          className="border-0 shadow-none focus-visible:ring-0 font-semibold text-slate-700 placeholder:text-slate-300 h-14 px-0"
+        />
+        {value && (
+          <button
+            type="button"
+            onClick={onClear}
+            className="text-slate-300 hover:text-slate-500 transition shrink-0"
+            aria-label={`Clear ${placeholder}`}
+          >
+            ✕
+          </button>
+        )}
+      </div>
+      {open && filtered.length > 0 && (
+        <ul className="absolute top-full left-0 right-0 z-50 mt-1 bg-white rounded-2xl border border-green-100 shadow-xl max-h-52 overflow-y-auto">
+          {filtered.map((opt) => (
+            <li
+              key={opt}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                onChange(opt);
+                setOpen(false);
+              }}
+              className="px-5 py-3 text-sm font-semibold text-slate-700 hover:bg-teal-50 hover:text-teal-700 cursor-pointer first:rounded-t-2xl last:rounded-b-2xl transition-colors"
+            >
+              {opt}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
 function ProvidersContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
   const [providers, setProviders] = useState<Provider[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchOptions, setSearchOptions] = useState<SearchOptions>({
+    specialties: [],
+    cities: [],
+    provinces: [],
+  });
   const [specialtyInput, setSpecialtyInput] = useState(searchParams.get('specialty') ?? '');
   const [cityInput, setCityInput] = useState(searchParams.get('city') ?? '');
   const [provinceInput, setProvinceInput] = useState(searchParams.get('province') ?? '');
+
+  useEffect(() => {
+    axios.get('/v1/providers/options').then((res) => setSearchOptions(res.data));
+  }, []);
 
   const fetchProviders = useCallback(async (specialty: string, city: string, province: string) => {
     setLoading(true);
@@ -80,28 +162,18 @@ function ProvidersContent() {
       {/* Search bar */}
       <form onSubmit={handleSearch} className="mb-10 flex flex-col gap-3">
         <div className="flex gap-3">
-          <div className="flex-1 bg-white rounded-2xl border border-green-100 shadow-sm flex items-center px-5 gap-3">
-            <svg className="w-4 h-4 text-teal-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
-            </svg>
-            <Input
-              type="text"
-              placeholder="Search by specialty (e.g. Cardiology)"
-              value={specialtyInput}
-              onChange={(e) => setSpecialtyInput(e.target.value)}
-              className="border-0 shadow-none focus-visible:ring-0 font-semibold text-slate-700 placeholder:text-slate-300 h-14 px-0"
-            />
-            {specialtyInput && (
-              <button
-                type="button"
-                onClick={() => setSpecialtyInput('')}
-                className="text-slate-300 hover:text-slate-500 transition shrink-0"
-                aria-label="Clear specialty"
-              >
-                ✕
-              </button>
-            )}
-          </div>
+          <SuggestionInput
+            value={specialtyInput}
+            onChange={setSpecialtyInput}
+            onClear={() => setSpecialtyInput('')}
+            options={searchOptions.specialties}
+            placeholder="Search by specialty (e.g. Cardiology)"
+            prefix={
+              <svg className="w-4 h-4 text-teal-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
+              </svg>
+            }
+          />
           <Button
             type="submit"
             className="px-8 h-14 rounded-2xl bg-[#2DD4BF] hover:bg-teal-500 text-[#164E63] font-black shadow-lg active:scale-95 transition-all"
@@ -110,30 +182,20 @@ function ProvidersContent() {
           </Button>
         </div>
         <div className="flex gap-3">
-          <div className="flex-1 bg-white rounded-2xl border border-green-100 shadow-sm flex items-center px-5 gap-3">
-            <Input
-              type="text"
-              placeholder="City (e.g. Toronto)"
-              value={cityInput}
-              onChange={(e) => setCityInput(e.target.value)}
-              className="border-0 shadow-none focus-visible:ring-0 font-semibold text-slate-700 placeholder:text-slate-300 h-14 px-0"
-            />
-            {cityInput && (
-              <button type="button" onClick={() => setCityInput('')} className="text-slate-300 hover:text-slate-500 transition shrink-0" aria-label="Clear city">✕</button>
-            )}
-          </div>
-          <div className="flex-1 bg-white rounded-2xl border border-green-100 shadow-sm flex items-center px-5 gap-3">
-            <Input
-              type="text"
-              placeholder="Province (e.g. ON)"
-              value={provinceInput}
-              onChange={(e) => setProvinceInput(e.target.value)}
-              className="border-0 shadow-none focus-visible:ring-0 font-semibold text-slate-700 placeholder:text-slate-300 h-14 px-0"
-            />
-            {provinceInput && (
-              <button type="button" onClick={() => setProvinceInput('')} className="text-slate-300 hover:text-slate-500 transition shrink-0" aria-label="Clear province">✕</button>
-            )}
-          </div>
+          <SuggestionInput
+            value={cityInput}
+            onChange={setCityInput}
+            onClear={() => setCityInput('')}
+            options={searchOptions.cities}
+            placeholder="City (e.g. Toronto)"
+          />
+          <SuggestionInput
+            value={provinceInput}
+            onChange={setProvinceInput}
+            onClear={() => setProvinceInput('')}
+            options={searchOptions.provinces}
+            placeholder="Province (e.g. ON)"
+          />
         </div>
       </form>
 

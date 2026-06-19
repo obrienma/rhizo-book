@@ -50,6 +50,21 @@ export class ProvidersController {
     return this.providersService.findAll(specialty, city, province);
   }
 
+  @Get('options')
+  @ApiOperation({
+    summary: 'Get distinct search filter values',
+    description:
+      'Returns distinct non-null values for specialty, city, and province across all provider profiles. ' +
+      'Used to populate autocomplete suggestions in the search UI. Public endpoint.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Object with arrays of distinct specialties, cities, and provinces.',
+  })
+  getSearchOptions() {
+    return this.providersService.findSearchOptions();
+  }
+
   @Get(':id')
   @ApiOperation({
     summary: 'Get a provider by ID',

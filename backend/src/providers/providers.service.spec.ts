@@ -145,6 +145,88 @@ describe('ProvidersService', () => {
     });
   });
 
+  describe('findSearchOptions', () => {
+    it('should return structured object with string arrays', async () => {
+      prisma.providerProfile.findMany
+        .mockResolvedValueOnce([{ specialty: 'Cardiology' }, { specialty: 'Neurology' }])
+        .mockResolvedValueOnce([{ city: 'Toronto' }, { city: 'Vancouver' }])
+        .mockResolvedValueOnce([{ province: 'ON' }, { province: 'BC' }]);
+
+      const result = await service.findSearchOptions();
+
+      expect(result).toEqual({
+        specialties: ['Cardiology', 'Neurology'],
+        cities: ['Toronto', 'Vancouver'],
+        provinces: ['ON', 'BC'],
+      });
+    });
+
+    it('should query distinct specialties excluding nulls ordered asc', async () => {
+      prisma.providerProfile.findMany
+        .mockResolvedValueOnce([])
+        .mockResolvedValueOnce([])
+        .mockResolvedValueOnce([]);
+
+      await service.findSearchOptions();
+
+      expect(prisma.providerProfile.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          select: { specialty: true },
+          distinct: ['specialty'],
+          where: { specialty: { not: null } },
+          orderBy: { specialty: 'asc' },
+        }),
+      );
+    });
+
+    it('should query distinct cities excluding nulls ordered asc', async () => {
+      prisma.providerProfile.findMany
+        .mockResolvedValueOnce([])
+        .mockResolvedValueOnce([])
+        .mockResolvedValueOnce([]);
+
+      await service.findSearchOptions();
+
+      expect(prisma.providerProfile.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          select: { city: true },
+          distinct: ['city'],
+          where: { city: { not: null } },
+          orderBy: { city: 'asc' },
+        }),
+      );
+    });
+
+    it('should query distinct provinces excluding nulls ordered asc', async () => {
+      prisma.providerProfile.findMany
+        .mockResolvedValueOnce([])
+        .mockResolvedValueOnce([])
+        .mockResolvedValueOnce([]);
+
+      await service.findSearchOptions();
+
+      expect(prisma.providerProfile.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          select: { province: true },
+          distinct: ['province'],
+          where: { province: { not: null } },
+          orderBy: { province: 'asc' },
+        }),
+      );
+    });
+
+    it('should return empty arrays when no profiles exist', async () => {
+      prisma.providerProfile.findMany
+        .mockResolvedValueOnce([])
+        .mockResolvedValueOnce([])
+        .mockResolvedValueOnce([]);
+
+      const result = await service.findSearchOptions();
+
+      expect(result).toEqual({ specialties: [], cities: [], provinces: [] });
+    });
+  });
+
   describe('findOne', () => {
     it('should return a single provider by id', async () => {
       const provider = {
