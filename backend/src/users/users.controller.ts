@@ -38,7 +38,7 @@ export class UsersController {
     summary: 'Get a user by ID',
     description: 'Returns full user details including role and profile. Password is omitted.',
   })
-  @ApiParam({ name: 'id', description: 'Numeric user ID', example: 12 })
+  @ApiParam({ name: 'id', description: 'Numeric user ID', example: 28 })
   @ApiResponse({
     status: 200,
     description: 'User object with role and profile.',

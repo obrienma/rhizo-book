@@ -15,6 +15,7 @@ import {
   ApiBearerAuth,
   ApiResponse,
   ApiParam,
+  ApiBody,
 } from '@nestjs/swagger';
 import { AppointmentsService } from './appointments.service';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
@@ -36,6 +37,41 @@ export class AppointmentsController {
       'Creates an appointment between the authenticated patient and the specified provider. ' +
       'The API checks for double-booking conflicts before persisting. ' +
       'startTime and endTime must be valid ISO 8601 datetimes and endTime must be after startTime.',
+  })
+  @ApiBody({
+    type: CreateAppointmentDto,
+    examples: {
+      familyMedicine: {
+        summary: 'Sarah Johnson — Family Medicine (30 min)',
+        description: 'Book a 30-minute slot with Dr. Sarah Johnson (provider ID 1)',
+        value: {
+          providerId: 1,
+          startTime: '2026-08-04T09:00:00.000Z',
+          endTime: '2026-08-04T09:30:00.000Z',
+          notes: 'Annual checkup and blood pressure review.',
+        },
+      },
+      cardiology: {
+        summary: 'Mike Chen — Cardiology (45 min)',
+        description: 'Book a 45-minute slot with Dr. Mike Chen (provider ID 2)',
+        value: {
+          providerId: 2,
+          startTime: '2026-08-05T08:00:00.000Z',
+          endTime: '2026-08-05T08:45:00.000Z',
+          notes: 'Cardiology follow-up.',
+        },
+      },
+      psychiatry: {
+        summary: 'Sophie Dubois — Psychiatry (50 min)',
+        description: 'Book a 50-minute slot with Dr. Sophie Dubois (provider ID 7)',
+        value: {
+          providerId: 7,
+          startTime: '2026-08-04T11:00:00.000Z',
+          endTime: '2026-08-04T11:50:00.000Z',
+          notes: 'Stress management session.',
+        },
+      },
+    },
   })
   @ApiResponse({
     status: 201,
@@ -83,7 +119,7 @@ export class AppointmentsController {
       'Both the provider and the patient of the appointment may access it; ' +
       'any other user receives 403.',
   })
-  @ApiParam({ name: 'id', description: 'Numeric appointment ID', example: 42 })
+  @ApiParam({ name: 'id', description: 'Numeric appointment ID', example: 83 })
   @ApiResponse({
     status: 200,
     description: 'Full appointment object with provider and patient detail.',
@@ -104,7 +140,20 @@ export class AppointmentsController {
       'Only appointments in SCHEDULED status can be cancelled. ' +
       'Both the provider and the patient may cancel.',
   })
-  @ApiParam({ name: 'id', description: 'Numeric appointment ID', example: 42 })
+  @ApiParam({ name: 'id', description: 'Numeric appointment ID', example: 109 })
+  @ApiBody({
+    type: CancelAppointmentDto,
+    examples: {
+      withReason: {
+        summary: 'Cancel with a reason',
+        value: { reason: 'Schedule conflict — need to reschedule.' },
+      },
+      noReason: {
+        summary: 'Cancel with no reason (reason is optional)',
+        value: {},
+      },
+    },
+  })
   @ApiResponse({
     status: 200,
     description: 'Appointment successfully cancelled. Returns updated appointment object.',

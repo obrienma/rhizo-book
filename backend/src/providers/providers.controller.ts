@@ -7,7 +7,7 @@ import {
   ApiQuery,
 } from '@nestjs/swagger';
 import { ProvidersService } from './providers.service';
-import { ProviderEntity } from './entities/provider.entity';
+import { ProviderEntity, SearchOptionsEntity } from './entities/provider.entity';
 
 @ApiTags('Providers')
 @Controller({ path: 'providers', version: '1' })
@@ -25,16 +25,43 @@ export class ProvidersController {
     name: 'specialty',
     required: false,
     description: 'Case-insensitive partial match on provider specialty',
+    schema: {
+      type: 'string',
+      default: 'Family Medicine',
+      enum: [
+        'Cardiology',
+        'Dermatology',
+        'Family Medicine',
+        'Neurology',
+        'Pediatrics',
+      ],
+    },
   })
   @ApiQuery({
     name: 'city',
     required: false,
     description: 'Case-insensitive partial match on provider city',
+    schema: {
+      type: 'string',
+      default: 'Toronto',
+      enum: [
+        'Calgary',
+        'Montreal',
+        'Ottawa',
+        'Toronto',
+        'Vancouver',
+      ],
+    },
   })
   @ApiQuery({
     name: 'province',
     required: false,
-    description: 'Case-insensitive partial match on provider province (e.g. ON)',
+    description: 'Case-insensitive partial match on provider province',
+    schema: {
+      type: 'string',
+      default: 'ON',
+      enum: ['AB', 'BC', 'ON', 'QC'],
+    },
   })
   @ApiResponse({
     status: 200,
@@ -59,7 +86,8 @@ export class ProvidersController {
   })
   @ApiResponse({
     status: 200,
-    description: 'Object with arrays of distinct specialties, cities, and provinces.',
+    description: 'Distinct specialties, cities, and provinces sorted A–Z.',
+    type: SearchOptionsEntity,
   })
   getSearchOptions() {
     return this.providersService.findSearchOptions();
@@ -72,7 +100,7 @@ export class ProvidersController {
       "Returns a specific provider's details including their profile and active " +
       'availability slots. Public endpoint — no authentication required.',
   })
-  @ApiParam({ name: 'id', description: 'Numeric provider user ID', example: 7 })
+  @ApiParam({ name: 'id', description: 'Numeric provider user ID', example: 1 })
   @ApiResponse({
     status: 200,
     description: 'Provider object with profile and active availability slots.',

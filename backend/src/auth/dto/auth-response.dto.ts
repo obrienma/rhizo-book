@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 class RoleDto {
-  @ApiProperty({ example: 1 })
+  @ApiProperty({ example: 2 })
   id: number;
 
   @ApiProperty({ example: 'patient', enum: ['provider', 'patient'] })
@@ -9,10 +9,10 @@ class RoleDto {
 }
 
 class AuthUserDto {
-  @ApiProperty({ example: 12 })
+  @ApiProperty({ example: 28 })
   id: number;
 
-  @ApiProperty({ example: 'alice.patient@example.com' })
+  @ApiProperty({ example: 'alice.smith@email.com' })
   email: string;
 
   @ApiProperty({ example: 'Alice Smith' })

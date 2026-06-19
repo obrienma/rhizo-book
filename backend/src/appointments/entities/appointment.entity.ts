@@ -1,30 +1,30 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class AppointmentUserEntity {
-  @ApiProperty({ example: 7 })
+  @ApiProperty({ example: 1 })
   id: number;
 
-  @ApiProperty({ example: 'Bob Johnson' })
+  @ApiProperty({ example: 'Sarah Johnson' })
   name: string;
 
-  @ApiProperty({ example: 'bob.provider@example.com' })
+  @ApiProperty({ example: 'sarah.johnson@clinic.com' })
   email: string;
 }
 
 export class AppointmentEntity {
-  @ApiProperty({ example: 42 })
+  @ApiProperty({ example: 83 })
   id: number;
 
-  @ApiProperty({ example: 7, description: 'Provider user ID' })
+  @ApiProperty({ example: 1, description: 'Provider user ID' })
   providerId: number;
 
-  @ApiProperty({ example: 12, description: 'Patient user ID' })
+  @ApiProperty({ example: 28, description: 'Patient user ID' })
   patientId: number;
 
-  @ApiProperty({ example: '2026-03-15T09:00:00.000Z' })
+  @ApiProperty({ example: '2026-07-15T09:00:00.000Z' })
   startTime: string;
 
-  @ApiProperty({ example: '2026-03-15T09:30:00.000Z' })
+  @ApiProperty({ example: '2026-07-15T09:30:00.000Z' })
   endTime: string;
 
   @ApiProperty({

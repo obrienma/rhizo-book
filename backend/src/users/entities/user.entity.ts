@@ -1,10 +1,10 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class RoleEntity {
-  @ApiProperty({ example: 1 })
+  @ApiProperty({ example: 2 })
   id: number;
 
-  @ApiProperty({ example: 'provider', enum: ['provider', 'patient'] })
+  @ApiProperty({ example: 'patient', enum: ['provider', 'patient'] })
   name: string;
 }
 
@@ -12,16 +12,16 @@ export class ProviderProfileEntity {
   @ApiProperty({ example: 1 })
   id: number;
 
-  @ApiProperty({ example: 7 })
+  @ApiProperty({ example: 1 })
   userId: number;
 
-  @ApiPropertyOptional({ example: 'Cardiology' })
+  @ApiPropertyOptional({ example: 'Family Medicine' })
   specialty: string | null;
 
-  @ApiPropertyOptional({ example: 'Board-certified cardiologist with 15 years of experience.' })
+  @ApiPropertyOptional({ example: 'Board-certified family physician with 12 years of experience treating patients of all ages.' })
   bio: string | null;
 
-  @ApiPropertyOptional({ example: 'MD-2048-CA' })
+  @ApiPropertyOptional({ example: 'MD-10021-CA' })
   licenseNumber: string | null;
 
   @ApiProperty({ example: 30, description: 'Appointment duration in minutes' })
@@ -29,27 +29,27 @@ export class ProviderProfileEntity {
 }
 
 export class PatientProfileEntity {
-  @ApiProperty({ example: 3 })
+  @ApiProperty({ example: 1 })
   id: number;
 
-  @ApiProperty({ example: 12 })
+  @ApiProperty({ example: 28 })
   userId: number;
 
-  @ApiPropertyOptional({ example: '1990-06-15T00:00:00.000Z' })
+  @ApiPropertyOptional({ example: '1990-03-22T00:00:00.000Z' })
   dateOfBirth: string | null;
 
   @ApiPropertyOptional({ example: '+1-555-867-5309' })
   phone: string | null;
 
-  @ApiPropertyOptional({ example: 'No known drug allergies.' })
+  @ApiPropertyOptional({ example: 'Mild hypertension, takes lisinopril 10mg daily. No known drug allergies.' })
   medicalNotes: string | null;
 }
 
 export class UserEntity {
-  @ApiProperty({ example: 12 })
+  @ApiProperty({ example: 28 })
   id: number;
 
-  @ApiProperty({ example: 'alice.patient@example.com' })
+  @ApiProperty({ example: 'alice.smith@email.com' })
   email: string;
 
   @ApiProperty({ example: 'Alice Smith' })

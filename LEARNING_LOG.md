@@ -4,6 +4,51 @@ Patterns, anti-patterns, challenges, and decisions encountered during developmen
 
 ---
 
+## 2026-06-19 — Swagger Documentation Audit & Example Data
+
+### Patterns
+
+**Q:** How do you provide multiple pre-filled request bodies in Swagger UI so a user can pick between them without typing?
+**A:** Use `@ApiBody({ type: Dto, examples: { key: { summary: '...', value: {...} } } })` on the controller method. NestJS Swagger maps this to the OpenAPI 3.0 `requestBody.content.*.examples` map, which Swagger UI renders as a labelled dropdown above the body editor in "Try it out" mode. Selecting an entry replaces the body with that value in one click.
+
+**Q:** What is the difference between `example` in `@ApiProperty` and `examples` in `@ApiBody`?
+**A:** `@ApiProperty({ example: ... })` sets a property-level example — it appears in the schema model view and as the default scaffold when no operation-level example overrides it. `@ApiBody({ examples: {...} })` sets operation-level named examples — these take precedence in "Try it out" and give users a dropdown to switch between scenarios. Use both: property-level examples fill in the schema tab; operation-level examples drive the interactive demo.
+
+**Q:** How do you add a typed response schema to a NestJS Swagger endpoint that returns a plain object (not a DTO class)?
+**A:** Create a dedicated entity/response class with `@ApiProperty` decorators and pass it to `@ApiResponse({ type: MyResponseEntity })`. Without a `type`, Swagger renders the response as an empty schema, giving users no idea what fields to expect. The class does not need to be used at runtime — it exists purely as a documentation contract.
+
+---
+
+### Anti-Patterns
+
+**Q:** Why is using a fictitious email like `bobprovider@test.com` as a Swagger example harmful?
+**A:** If a user clicks "Try it out" and executes with the default values, they get a 401. The failure looks like a bug in the API rather than a documentation problem. Swagger examples for auth endpoints should always reference real seed credentials so the default execute path succeeds. The cost of keeping examples in sync with seed data is low; the cost of a broken first impression is high.
+
+**Q:** Why shouldn't example dates in Swagger DTOs reference past dates?
+**A:** A recruiter or new engineer who copies the example to book an appointment will get a validation error or a logically invalid booking. Examples should be far enough in the future (a month or more) that they remain valid for the foreseeable life of the documentation.
+
+---
+
+### Challenges
+
+**Q:** The `GET /v1/providers/options` endpoint had an `@ApiResponse` but no `type` — the response schema in Swagger was empty. What was the fix?
+**A:** Create a `SearchOptionsEntity` class with three `@ApiProperty({ type: [String], example: [...] })` fields (specialties, cities, provinces) and pass it to `@ApiResponse({ type: SearchOptionsEntity })`. The example arrays were populated from a live DB query (`prisma.providerProfile.findMany` with `distinct`) so the values shown are exactly what the endpoint returns.
+
+**Q:** Several entity example IDs (e.g., `id: 7`, `id: 12`) did not match any real row in the database. How were the correct IDs determined?
+**A:** Queried the live Neon database directly via Prisma client in a one-off Node script. This confirmed: providers are IDs 1–27 (Sarah Johnson = 1), patients start at ID 28 (Alice Smith = 28), patient profiles and the first availability slot have their own auto-increment sequences. Hardcoding DB IDs in Swagger examples is acceptable as long as they reference seed rows that are deterministically recreated by `npx prisma db seed`.
+
+---
+
+### Decisions
+
+**Q:** For the cancel endpoint `@ApiParam` example, should the appointment ID shown be one Alice has already been shown at `GET /appointments/:id`?
+**A:** No — use a different appointment ID. If the walkthrough shows `GET /appointments/83` and then `PATCH /appointments/83/cancel`, a user following the steps in order would cancel the appointment they just fetched, making subsequent re-fetches return CANCELLED status rather than the SCHEDULED state the documentation implies. Using `109` (Alice's second scheduled appointment) keeps `83` permanently demonstrable.
+
+**Q:** Should the register DTO example use a real seeded email or a fictitious one?
+**A:** Fictitious (`new.patient@example.com`). Registration creates a new user — using a seeded email would produce a 409 Conflict the first time anyone tries it, and repeated executions would always fail. The login DTO is the opposite case: it must use a real seeded email or the default execute always fails with 401.
+
+---
+
 ## 2026-06-01 — Post-Registration Provider Context Preservation
 
 ### Patterns

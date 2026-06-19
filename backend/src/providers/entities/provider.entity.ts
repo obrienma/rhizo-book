@@ -1,10 +1,33 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
+export class SearchOptionsEntity {
+  @ApiProperty({
+    example: ['Cardiology', 'Dermatology', 'Family Medicine', 'Neurology', 'Pediatrics'],
+    description: 'Distinct specialties across all provider profiles, sorted A–Z',
+    type: [String],
+  })
+  specialties: string[];
+
+  @ApiProperty({
+    example: ['Calgary', 'Montreal', 'Ottawa', 'Toronto', 'Vancouver'],
+    description: 'Distinct cities across all provider profiles, sorted A–Z',
+    type: [String],
+  })
+  cities: string[];
+
+  @ApiProperty({
+    example: ['AB', 'BC', 'ON', 'QC'],
+    description: 'Distinct province codes across all provider profiles, sorted A–Z',
+    type: [String],
+  })
+  provinces: string[];
+}
+
 export class AvailabilitySlotEntity {
-  @ApiProperty({ example: 4 })
+  @ApiProperty({ example: 85 })
   id: number;
 
-  @ApiProperty({ example: 3, description: 'Profile ID of the provider' })
+  @ApiProperty({ example: 1, description: 'Profile ID of the provider' })
   providerId: number;
 
   @ApiProperty({ example: 1, description: '0 = Sunday … 6 = Saturday' })
@@ -21,16 +44,16 @@ export class AvailabilitySlotEntity {
 }
 
 export class ProviderProfileDetailEntity {
-  @ApiProperty({ example: 3 })
+  @ApiProperty({ example: 1 })
   id: number;
 
-  @ApiProperty({ example: 7 })
+  @ApiProperty({ example: 1 })
   userId: number;
 
-  @ApiPropertyOptional({ example: 'Cardiology' })
+  @ApiPropertyOptional({ example: 'Family Medicine' })
   specialty: string | null;
 
-  @ApiPropertyOptional({ example: 'Board-certified cardiologist with 15 years of experience.' })
+  @ApiPropertyOptional({ example: 'Board-certified family physician with 12 years of experience treating patients of all ages.' })
   bio: string | null;
 
   @ApiPropertyOptional({ example: 'Toronto' })
@@ -39,7 +62,7 @@ export class ProviderProfileDetailEntity {
   @ApiPropertyOptional({ example: 'ON' })
   province: string | null;
 
-  @ApiPropertyOptional({ example: 'MD-2048-CA' })
+  @ApiPropertyOptional({ example: 'MD-10021-CA' })
   licenseNumber: string | null;
 
   @ApiProperty({ example: 30, description: 'Appointment slot duration in minutes' })
@@ -50,13 +73,13 @@ export class ProviderProfileDetailEntity {
 }
 
 export class ProviderEntity {
-  @ApiProperty({ example: 7 })
+  @ApiProperty({ example: 1 })
   id: number;
 
-  @ApiProperty({ example: 'Dr. Bob Johnson' })
+  @ApiProperty({ example: 'Sarah Johnson' })
   name: string;
 
-  @ApiProperty({ example: 'bob.provider@example.com' })
+  @ApiProperty({ example: 'sarah.johnson@clinic.com' })
   email: string;
 
   @ApiPropertyOptional({ type: () => ProviderProfileDetailEntity })

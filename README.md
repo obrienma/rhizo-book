@@ -24,7 +24,7 @@ flowchart LR
     end
     A -->|page requests| B
     A -->|sign in / out| C
-    B -->|/v1/* rewrite| D
+    B -->|backend requests| D
     C -->|JWT exchange| D
     D -->|Prisma ORM| E
 ```
@@ -32,12 +32,11 @@ flowchart LR
 ---
 
 ## 📋 Contents
-
-- [📋 Contents](#-contents)
 - [🧰 Stack](#-stack)
 - [🚀 Running the Project](#-running-the-project)
   - [✅ Prerequisites](#-prerequisites)
   - [⚡ Quick Start](#-quick-start)
+  - [🔍 Exploring the API (Swagger UI)](#-exploring-the-api-swagger-ui)
   - [📦 npm Scripts](#-npm-scripts)
 - [🏗️ Architecture](#️-architecture)
   - [🔀 Architecture Diagram](#-architecture-diagram)
@@ -48,6 +47,10 @@ flowchart LR
 - [🗺️ Roadmap](#️-roadmap)
   - [📋 Planned](#-planned)
   - [📦 Implementation History](#-implementation-history)
+    - [🔧 Core API \& Auth (Phases 1–3)](#-core-api--auth-phases-13)
+    - [🖥️ Frontend \& Booking Flow (Phases 4–6)](#️-frontend--booking-flow-phases-46)
+    - [🌐 Public \& Branding (Phases 7–8)](#-public--branding-phases-78)
+    - [🔍 Search \& Discovery (Phases 9–11)](#-search--discovery-phases-911)
 
 
 ## 🧰 Stack
@@ -112,6 +115,34 @@ open http://localhost:3000
 # Swagger UI
 open http://localhost:3001/api
 ```
+
+### 🔍 Exploring the API (Swagger UI)
+
+The live API documentation is at **[api.rhizobook.cyberrhizome.ca/api](https://api.rhizobook.cyberrhizome.ca/api)** — no local setup needed.
+
+Every endpoint has pre-filled example payloads. Authenticated endpoints are marked with a 🔒 padlock. To unlock them:
+
+> [!TIP]
+> **All seed accounts share the password `password123`.**
+>
+> 1. Open **`POST /auth/login`** → click **Try it out** → pick **"Patient — Alice Smith"** from the example dropdown → **Execute**
+> 2. Copy the `access_token` from the response body
+> 3. Click **Authorize 🔓** at the top of the page → paste the token → **Authorize**
+> 4. All 🔒 endpoints are now unlocked for the session
+
+**Suggested walkthrough:**
+
+| Step | Endpoint | What to see |
+| --- | --- | --- |
+| 1 | `POST /auth/login` | Receive a JWT and Alice's user/role object |
+| 2 | `GET /appointments` | Alice's full appointment history (past + upcoming) |
+| 3 | `GET /appointments/83` | Single appointment with nested provider + patient detail |
+| 4 | `PATCH /appointments/109/cancel` | Cancel an appointment; response shows updated status |
+| 5 | `GET /providers` | All 27 providers — **no auth required** |
+| 6 | `GET /providers/options` | Distinct specialties, cities, and provinces for autocomplete |
+| 7 | `GET /providers/1` | Sarah Johnson's full profile with availability slots |
+
+To explore as a **provider**, log in as `sarah.johnson@clinic.com` (step 1 dropdown: *Provider — Sarah Johnson*) and repeat steps 2–4 to see her appointment view.
 
 ### 📦 npm Scripts
 
@@ -222,7 +253,7 @@ flowchart LR
 
 | File | Contents | Last updated |
 | --- | --- | --- |
-| [README.md](README.md) | Project overview | 2026-06-18 |
+| [README.md](README.md) | Project overview | 2026-06-19 |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | System design, data model, module map, auth flow | 2026-05-29 |
 | [docs/DEV_GETTING_STARTED.md](docs/DEV_GETTING_STARTED.md) | Full local setup walkthrough | 2026-05-01 |
 | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Railway + Vercel + Neon production deployment | 2026-04-30 |
@@ -241,10 +272,11 @@ flowchart LR
 - [ ] **Recurring availability schedules:** Let providers define weekly recurring slots rather than one-off entries.
 - [ ] **Timezone handling:** Store and display availability in the provider's local timezone; convert on booking for the patient.
 - [ ] **HIPAA compliance features:** Audit logging, data retention controls, and access-log visibility.
+- [ ] **Personalized provider search:** For authenticated users, surface previously-booked providers at the top of autocomplete suggestions in the provider search fields.
 
 ### 📦 Implementation History
 
-> [!TIP]
+> [!NOTE]
 > **11 Phases Completed** | Backend and frontend test suites passing
 
 <details>
