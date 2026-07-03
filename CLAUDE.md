@@ -68,7 +68,7 @@ Two route groups share the same layout (`(app)/layout.tsx` with `<Navigation>`):
 - `(app)/` — authenticated + unauthenticated routes alike (dashboard, appointments, providers list, provider detail). No middleware blocks unauthenticated access; individual pages handle it.
 - `(marketing)/` — public landing page.
 
-**API calls:** Browser-side code uses relative `/v1/...` paths, which `next.config.ts` rewrites to `BACKEND_URL`. Never hardcode `localhost:3001` in component code.
+**API calls:** Browser-side code uses relative `/v1/...` paths, which `next.config.js` rewrites to `BACKEND_URL`. Never hardcode `localhost:3001` in component code.
 
 **Two axios instances:**
 - `lib/api.ts` — authenticated client (`baseURL: '/v1'`, attaches JWT from session via interceptor). Use for all patient/provider actions requiring login.

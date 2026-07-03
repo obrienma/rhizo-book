@@ -59,12 +59,12 @@ flowchart LR
 
 - **NestJS 11:** Module-per-domain architecture (`auth`, `users`, `providers`, `appointments`), each with its own controller → service → Prisma layer. `JwtAuthGuard` applied per-controller so public provider routes need no extra annotation.
 - **Passport.js + JWT:** Stateless token auth issued by the backend. `JwtStrategy` validates tokens on every guarded request.
-- **Prisma 6:** Type-safe ORM over PostgreSQL. All queries use explicit `select` to prevent accidental field exposure on public endpoints.
+- **Prisma 5:** Type-safe ORM over PostgreSQL. All queries use explicit `select` to prevent accidental field exposure on public endpoints.
 - **Swagger / OpenAPI:** Fully documented API with typed request/response schemas at [`/api`](https://api.rhizobook.cyberrhizome.ca/api).
 
 **🖥️ Frontend**
 
-- **Next.js 15 (App Router):** Route groups separate `(marketing)` (public landing), `(app)` (authenticated + shared nav), and auth pages. `useSearchParams` is always wrapped in `<Suspense>` for static generation compatibility.
+- **Next.js 16 (App Router):** Route groups separate `(marketing)` (public landing), `(app)` (authenticated + shared nav), and auth pages. `useSearchParams` is always wrapped in `<Suspense>` for static generation compatibility.
 - **NextAuth v4:** JWT session strategy. Auth handler lives in `app/api/auth/`. `signOut` uses `window.location.origin` as `callbackUrl` to stay port-agnostic.
 - **Tailwind CSS + shadcn/ui:** Utility-first styling with accessible component primitives.
 - **react-hook-form + Zod:** Typed form validation with shared schemas across client and server boundary.
@@ -151,12 +151,15 @@ To explore as a **provider**, log in as `sarah.johnson@clinic.com` (step 1 dropd
 | Script | Description |
 | --- | --- |
 | `npm run start:dev` | Watch mode dev server (port 3001) |
+| `npm run start:prod` | Run compiled `dist/` |
 | `npm run build` | Compile to `dist/` |
 | `npm test` | Jest unit tests |
 | `npm run test:cov` | Coverage report |
 | `npm run lint` | ESLint with autofix |
+| `./refresh-db.sh` | Hard reset DB and re-seed (recommended) |
 | `npx prisma migrate dev` | Apply new migrations |
 | `npx prisma db seed` | Re-seed sample data |
+| `npx prisma generate` | Regenerate client after schema changes |
 | `npx prisma studio` | Visual DB browser |
 
 **Frontend (`/frontend`)**
@@ -258,8 +261,8 @@ flowchart LR
 | [docs/DEV_GETTING_STARTED.md](docs/DEV_GETTING_STARTED.md) | Full local setup walkthrough | 2026-05-01 |
 | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Railway + Vercel + Neon production deployment | 2026-04-30 |
 | [docs/adr/](docs/adr/) | Architecture Decision Records | 2026-04-30 |
+| [docs/SUGGESTED_IMPROVEMENTS.md](docs/SUGGESTED_IMPROVEMENTS.md) | Code quality audit — security, scheduling bugs, auth gaps, API design | 2026-02-25 |
 | [LEARNING_LOG.md](LEARNING_LOG.md) | Engineering journal — one entry per phase | 2026-06-18 |
-| [backend/README.md](backend/README.md) | Backend-specific commands and structure | 2026-02-25 |
 | [frontend/README.md](frontend/README.md) | Frontend-specific commands and structure | 2026-02-24 |
 
 

@@ -7,7 +7,7 @@ Health Appointment Scheduler is a monorepo containing a NestJS REST API backend 
 ```
 ┌─────────────────────┐        HTTPS         ┌──────────────────────────┐
 │   Next.js Frontend  │ ──────────────────►  │   NestJS Backend API     │
-│   (Next.js 15)      │ ◄──────────────────  │   (NestJS 11 / Node.js)  │
+│   (Next.js 16)      │ ◄──────────────────  │   (NestJS 11 / Node.js)  │
 │   Port 3000         │      JSON / JWT      │   Port 3001              │
 └─────────────────────┘                      └────────────┬─────────────┘
                                                           │ Prisma ORM
@@ -30,7 +30,7 @@ AppModule
 ├── PrismaModule        (global DB client)
 ├── AuthModule          POST /auth/register, POST /auth/login
 ├── UsersModule         GET  /users, GET  /users/:id
-├── ProvidersModule     GET  /providers, GET  /providers/:id
+├── ProvidersModule     GET  /providers[?specialty,city,province], GET  /providers/options, GET  /providers/:id
 └── AppointmentsModule  POST/GET /appointments, GET/PATCH /appointments/:id/cancel
 ```
 
@@ -63,6 +63,10 @@ src/
 ├── prisma/
 │   └── prisma.service.ts  (global PrismaClient wrapper)
 └── main.ts               Bootstrap, Swagger setup, CORS, ValidationPipe
+prisma/
+├── schema.prisma         Database schema
+├── migrations/           Migration history
+└── seed.ts               Sample data (27 providers, 28 patients, 73 appointments)
 ```
 
 ### Authentication Flow
@@ -110,7 +114,7 @@ app/
 ├── login/page.tsx           → NextAuth sign-in form
 ├── dashboard/page.tsx       → renders ProviderDashboard or PatientDashboard
 ├── providers/
-│   ├── page.tsx             → provider listing (patients only)
+│   ├── page.tsx             → provider listing (public)
 │   └── [id]/page.tsx        → provider detail + booking form
 └── appointments/page.tsx    → full appointment list with status filter + cancel
 ```

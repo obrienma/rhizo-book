@@ -40,8 +40,8 @@ See [../docs/DEV_GETTING_STARTED.md](../docs/DEV_GETTING_STARTED.md) for full se
 | `/register` | Patient account creation | Public |
 | `/register/provider` | Provider registration with clinic profile details | Public |
 | `/dashboard` | Patient or provider dashboard | Authenticated |
-| `/providers` | Browse all providers | Patient |
-| `/providers/[id]` | Provider detail + time slot picker + booking | Patient |
+| `/providers` | Browse all providers | Public |
+| `/providers/[id]` | Provider detail + time slot picker + booking | Public |
 | `/appointments` | Full appointment list with status filter + cancel | Authenticated |
 
 ## Project Structure
@@ -52,7 +52,7 @@ app/
 │   └── page.tsx         Landing page (interactive card links to signup)
 ├── (app)/
 │   ├── layout.tsx        Shared layout with Navigation
-│   ├── dashboard/        Renders PatientDashboard or ProviderDashboard by role
+│   ├── dashboard/        Renders PatientDashboard or ProviderDashboard by role`
 │   ├── providers/
 │   │   ├── page.tsx      Provider listing
 │   │   └── [id]/page.tsx Provider detail + time slot picker + booking
