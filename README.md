@@ -230,23 +230,23 @@ flowchart LR
   <tr>
     <td align="center">
       <a href="https://github.com/user-attachments/assets/b5462d91-3bfb-4e65-9a63-619a87600f63"><img src="https://github.com/user-attachments/assets/b5462d91-3bfb-4e65-9a63-619a87600f63" width="180" /></a>
-      <br /><sub>Provider listing</sub>
+      <br /><sub>Landing page</sub>
     </td>
     <td align="center">
       <a href="https://github.com/user-attachments/assets/3ef595fe-ac0d-4c42-8015-0b16eba506e0"><img src="https://github.com/user-attachments/assets/3ef595fe-ac0d-4c42-8015-0b16eba506e0" width="180" /></a>
-      <br /><sub>Patient dashboard</sub>
+      <br /><sub>Sign up</sub>
     </td>
     <td align="center">
       <a href="https://github.com/user-attachments/assets/c2c4ed37-fa64-476f-9c69-e85e0f9fe532"><img src="https://github.com/user-attachments/assets/c2c4ed37-fa64-476f-9c69-e85e0f9fe532" width="180" /></a>
-      <br /><sub>Booking flow</sub>
+      <br /><sub>Provider listing</sub>
     </td>
     <td align="center">
       <a href="https://github.com/user-attachments/assets/ca4288ab-b5dd-42c4-b3f6-5a72b0486580"><img src="https://github.com/user-attachments/assets/ca4288ab-b5dd-42c4-b3f6-5a72b0486580" width="180" /></a>
-      <br /><sub>Provider dashboard</sub>
+      <br /><sub>Booking flow</sub>
     </td>
     <td align="center">
       <a href="https://github.com/user-attachments/assets/f7a95033-f9f3-456a-8f88-0775dd43ce1e"><img src="https://github.com/user-attachments/assets/f7a95033-f9f3-456a-8f88-0775dd43ce1e" width="180" /></a>
-      <br /><sub>Appointment calendar</sub>
+      <br /><sub>Appointment dashboard</sub>
     </td>
   </tr>
 </table>
